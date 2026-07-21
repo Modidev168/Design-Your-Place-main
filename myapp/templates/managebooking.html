@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 0;
+            margin: 0;
+        }
+
+        .managebooking {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+            margin-top: 8%; /* Solves overlap with header */
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .portfolio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #bca88e;
+            color: black;
+            font-weight: bold;
+            border: 1px solid black;
+        }
+
+        .portfolio-table th, .portfolio-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .portfolio-table th {
+            background-color: #8e6f4e;
+            color: white;
+        }
+
+        .portfolio-table tr:nth-child(even) {
+            background-color: #d4b89b;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            background-color: red;
+        }
+
+        .btn-view {
+            background-color: blue;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: black !important;
+            border: 1px solid white !important;
+        }
+
+        .btn-delete:hover {
+            color: #bca88e !important;
+        }
+
+        @media screen and (max-width: 768px) {
+            .portfolio-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Optional: Smooth table area transition for nicer UI */
+        .portfolio-table tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .portfolio-table tr:hover {
+            background-color: #c7a982;
+        }
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+
+<section class="managebooking">
+    <h1>Show Booking</h1>
+
+    <table class="portfolio-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client Name</th>
+                <th>Designer</th>
+                <th>Package Type</th>
+                <th>Package Category</th>
+                <th>Total Amount</th>
+                <th>Location</th>
+                <th>Additional Requirement</th>
+                <th>Extra Services</th>
+                <th>Status</th>
+                {% if request.session.log_role != "Designer" %}
+                <th>Action</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in data %}
+            <tr>
+                <td>{{ i.id }}</td>
+                <td>{{ i.Client_Name }}</td>
+                <td>{{ i.package_id.Designerid.fullname }}</td>
+                <td>{{ i.package_type }}</td>
+                <td>{{ i.package_category }}</td>
+                <td>{{ i.package_id.package_price }}</td>
+                <td>{{ i.location }}</td>
+                <td>
+                {% if i.requirement %}
+                     {{ i.requirement }}
+                 {% else %}
+                     -
+                {% endif %}
+                </td>
+                <td>
+                {% if i.services %}
+                     {{ i.services }}
+                 {% else %}
+                     -
+                {% endif %}
+                </td>
+                <td>{{ i.status }}</td>
+                {% if request.session.log_role != "Designer" %}
+                    {% if i.status != "canceled" %}
+                        <td><a href="/cancelbooking/{{ i.id }}" class="btn btn-danger">Cancel</a></td>
+                    {% else %}
+                        <td><button class="btn btn-danger" disabled>Canceled</button></td>
+                    {% endif %}
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+{% include 'footer.html' %}
+</body>
+</html>

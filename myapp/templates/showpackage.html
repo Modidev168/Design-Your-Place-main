@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Packages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        /* Package Grid */
+        .package-items {
+            width: 90%; /* Make sure it takes the full width of its container */
+              display: grid;
+              margin-left:90px;
+              margin-right:50px;
+              grid-template-columns: repeat(3, 1fr); /* 4 items per row */
+              gap: 1rem;
+              animation: slideUp 1.5s ease-out;
+              padding: 20px; /* Adding padding for spacing */
+              margin-top:50px;
+
+        }
+
+        .package-item {
+           background-color:#bca88e;
+          padding: 1.5rem;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+          text-align: center;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .package-item img {
+            margin-top:10px;
+            margin-bottom:10px;
+            height: 370px;
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+            object-fit: cover;
+        }
+
+         .package-item h2 {
+            font-size: 1.5rem;
+            color: white;
+            padding: 10px;
+            background: black;
+            border-radius: 5px;
+            height: 80px;
+            display: flex;
+            justify-content: center; /* Centers text horizontally */
+            align-items: center; /* Centers text vertically */
+            text-align: center;
+        }
+
+        .package-item h3 {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            padding: 10px;
+            background: black;
+            border-radius: 5px;
+            height:50px;
+            text-align:center;
+        }
+
+        .package-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        .package-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .package-items {
+                grid-template-columns: repeat(2, 1fr); /* 2 items per row */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .package-items {
+                grid-template-columns: repeat(1, 1fr); /* 1 item per row */
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+<div class="box">
+    <section id="package" class="section">
+        <div class="package-items">
+            {% for i in packages %}
+                <div class="package-item">
+                    <h2>{{i.package_category}}</h2>
+                    <a href="../singlepackage/{{i.id}}">
+                        <img src="/media/{{ i.package_img }}" alt="Package Image">
+                    </a>
+
+                    <h3>RS. {{ i.package_price }}</h3>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+    {% include 'footer.html' %}
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer Portfolio Form</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      /* General Styling */
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.addportfolio-sec{
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    padding: 20px;
+    background-image: url("../static/images/frombackimg.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.box {
+    max-width: 700px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top:75px;
+}
+
+.header h1{
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 32px;
+    color: #ccddff;
+}
+
+p {
+    font-size: 16px;
+    color: #ccddff;
+}
+
+/* Form Styling */
+.portfolio-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 48%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ccddff;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input, textarea, select {
+     width: 100%;
+     padding: 12px;
+     margin: 10px 0 20px;
+     border: 1px solid #ccc;
+     border-radius: 5px;
+     box-sizing: border-box;
+}
+
+input:focus, textarea:focus {
+    border-color: #4CAF50;
+}
+
+textarea {
+    resize: vertical;
+    height: 80px;
+}
+
+.button {
+    background-color: #99bbff;
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+#work-upload{
+    color:#FFF;
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .form-group input, .form-group textarea {
+        font-size: 14px;
+    }
+
+    button {
+        font-size: 14px;
+    }
+}
+    </style>
+</head>
+<body>
+
+{% include 'header.html' %}
+
+{% if messages %}
+{% for i in messages %}
+<script>alert("{{ i }}");</script>
+{% endfor %}
+{% endif %}
+
+<section class="addportfolio-sec">
+    <div class="box">
+        <header class="header">
+            <h1>Designer Portfolio Submission</h1>
+        </header>
+
+        <form  class="portfolio-form" action="\fetchportfoliodata" method="POST" enctype="multipart/form-data">
+             {% csrf_token %}
+            <!-- About Yourself Input -->
+
+            <div class="form-group full-width">
+                <label for="name">Designer_Name</label>
+                <input type="text" id="name" name="Designer_Name" required/>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="about">About Yourself:</label>
+                <textarea id="about" name="about" rows="4" placeholder="Write a brief description about yourself and your design style" required></textarea>
+            </div>
+
+            <!--  Designer Skill  -->
+            <div class="form-group full-width">
+                <label for="skills">Designer Skills:</label>
+                <textarea id="skills" name="skills" rows="4" placeholder="e.g., Photoshop, Sketch, 3D Modeling" required></textarea>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+                <label for="experience">Experience and specialties:</label>
+                <textarea id="experience" name="experience" rows="4" placeholder="Describe your design experience and specialties" required></textarea>
+            </div>
+
+               <!-- Design Style Input -->
+            <div class="form-group">
+                <label for="style">Select Design Style:</label>
+                <select id="style" name="Design_style" onchange="updateCategories()" required>
+                    <option value="">Select Design Style</option>
+                    {% for portfolio in portfolio %}
+                        <option value="{{ portfolio.id }}">{{ portfolio.Portcatname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Upload Your Work Example -->
+            <div class="form-group">
+                <label for="work-upload">Upload a Designer Image:</label>
+                <input type="file" id="work-upload" name="work-upload" accept="image/*,video/*" required>
+            </div>
+            <!-- Submit Button -->
+            <div class="form-group full-width">
+                <input type="submit" value="Submit" class="button ">
+            </div>
+        </form>
+    </div>
+</section>
+{% include 'footer.html' %}
+
+<script>
+function updateCategories() {
+    var styleDropdown = document.getElementById("style");
+    var selectedOptionText = styleDropdown.options[styleDropdown.selectedIndex].text;
+    var categoryDropdown = document.getElementById("Category");
+
+    // Clear previous options
+    categoryDropdown.innerHTML = "<option value=''>Select a Category</option>";
+
+    var residentialCategories = [
+        { value: "WholeHouse", text: "Full Residence" },
+        { value: "LivingRoom", text: "Living Room" },
+        { value: "BedRoom", text: "Bed Room" },
+        { value: "Kitchen", text: "Kitchen" },
+        { value: "StoreRoom", text: "Store Room" },
+        { value: "ChildRoom", text: "Child Room" },
+        { value: "StudyRoom", text: "Study Room" },
+        { value: "BathRoom", text: "Bath Room" }
+    ];
+
+    var commercialCategories = [
+        { value: "Office", text: "Office" }
+    ];
+
+    var selectedCategories = [];
+
+    if (selectedOptionText === "Residential") {
+        selectedCategories = residentialCategories;
+    } else if (selectedOptionText === "Commercial") {
+        selectedCategories = commercialCategories;
+    }
+
+    selectedCategories.forEach(function(category) {
+        var option = document.createElement("option");
+        option.value = category.value;
+        option.textContent = category.text;
+        categoryDropdown.appendChild(option);
+    });
+}
+</script>
+
+</body>
+</html>

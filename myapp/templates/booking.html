@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .booking-sec {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 20px;
+            background-image: url("../static/images/frombackimg.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .booking-container {
+            max-width: 700px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top:75px;
+        }
+
+        .booking-container h1 {
+            font-size: 32px;
+            color: #ccddff;
+            margin-bottom: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+
+        }
+
+        .booking-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            width: 48%;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        /* Form Styling */
+        .mb-3 {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ccddff;
+            margin-bottom: 5px;
+        }
+
+        .form-select {
+            height: 45px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        /* General Styling */
+        /* Grid Layout: 2 checkboxes per row */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* 2 columns */
+            gap: 10px;
+            /* Spacing between checkboxes */
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            color: #ccddff;
+            /* Light color */
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .checkbox-item input {
+            margin-right: 10px;
+            transform: scale(1.2);
+            /* Bigger checkboxes */
+            cursor: pointer;
+        }
+
+        /* Responsive Fix */
+        @media screen and (max-width: 600px) {
+            .checkbox-group {
+                grid-template-columns: repeat(1, 1fr);
+                /* 1 checkbox per row on small screens */
+            }
+        }
+
+        /* Fix for checkboxes appearing in odd positions */
+        input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #99bbff;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: #99bbff;
+            border: none;
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '✔';
+            font-size: 14px;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Responsive Fix */
+        @media screen and (max-width: 600px) {
+            .checkbox-group {
+                grid-template-columns: repeat(1, 1fr);
+                /* One per row on small screens */
+            }
+        }
+
+        input[type="submit"] {
+            background-color: #99bbff;
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        @media screen and (max-width: 600px) {
+            .mb-3 {
+                width: 100%;
+            }
+    </style>
+</head>
+
+<body>
+    {% include 'header.html' %}
+    {% if messages %}
+    {% for i in messages %}
+    <script>alert("{{ i }}");</script>
+    {% endfor %}
+    {% endif %}
+
+    <section class="booking-sec">
+        <div class="booking-container">
+            <h1>Book Your Interior Design Service</h1>
+            <form class="booking-form" method="post" action="/featchbooking" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <input type="hidden" name="package_id" value="{{ data.id }}">
+
+    <div class="form-group">
+        <label for="style">Client Name</label>
+        <input type="text" id="style1" name="Client_Name" value="{{ request.session.log_name }}" required readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="style">Design Type</label>
+        <input type="text" id="style1" name="Design_style" value="{{ data.package_design_style }}" required readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="Package-type">Package Type:</label>
+        <input type="text" id="Package-type" name="Package-type" value="{{ data.package_type }}" required readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="category">Package Category:</label>
+        <input type="text" id="category" name="category" value="{{ data.package_category }}" required readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="date">Preferred Date & Time:</label>
+        <input type="datetime-local" id="date" name="date" required>
+    </div>
+
+    <div class="form-group">
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required>
+    </div>
+
+    <div class="form-group">
+        <label for="bhkType" class="form-label">BHK Type</label>
+        <select class="form-select" id="bhkType" name="bhkType" required>
+            <option value="" disabled selected>Select BHK Type</option>
+            <option value="1 BHK">1 BHK</option>
+            <option value="2 BHK">2 BHK</option>
+            <option value="3 BHK">3 BHK</option>
+            <option value="4 BHK or more">4 BHK or more</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="propertySize">Property Size (sq. ft.):</label>
+        <input type="number" id="propertySize" min="1" step="0.01" name="propertySize" required>
+    </div>
+
+    <div class="form-group">
+        <label>Time Duration:</label>
+        <input type="text" id="time" name="Time_duration" value="{{ data.time_duration }}" required readonly>
+    </div>
+
+    <div class="form-group">
+        <label for="basePrice">Base Package Price (INR):</label>
+        <input type="text" id="basePrice" value="{{ data.package_price }}" readonly>
+    </div>
+
+    <div class="form-group full-width">
+        <label for="requirement">Additional Requirement:</label>
+        <textarea id="requirement" name="requirement" rows="3"></textarea>
+    </div>
+
+    <div class="form-group full-width">
+        <label>Extra Services:</label>
+        <div class="checkbox-group">
+            <label class="checkbox-item">
+                <input type="checkbox" name="services" value="Color Combination" data-price="500">
+                Color Combination
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" name="services" value="WallPaper" data-price="700">
+                Wall Paper
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" name="services" value="POP Design" data-price="1000">
+                POP Design
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" name="services" value="Wardrobe Furniture" data-price="1500">
+                Wardrobe Furniture
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" name="services" value="Lighting Design" data-price="800">
+                Lighting Design 
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" name="services" value="Space Planning" data-price="1200">
+                Space Planning
+            </label>
+        </div>
+    </div>
+
+    <!-- Display Updated Total Price -->
+    <div class="form-group full-width">
+        <label for="totalPrice">Total Price (INR):</label>
+        <input type="text" id="totalPrice" name="total_price" value="{{ data.package_price }}" readonly>
+    </div>
+
+    <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="terms" required>
+        <label class="form-check-label" for="terms">I agree to the terms and conditions</label>
+    </div>
+
+    <div class="form-group full-width">
+        <input type="submit" value="Booking Now">
+    </div>
+</form>
+
+<!-- JavaScript for Price Calculation -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let basePrice = parseFloat(document.getElementById("basePrice").value); // Base price from Django
+        let totalPriceField = document.getElementById("totalPrice");
+        let checkboxes = document.querySelectorAll('input[name="services"]');
+
+        function updateTotalPrice() {
+            let totalPrice = basePrice;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    totalPrice += parseFloat(checkbox.getAttribute("data-price"));
+                }
+            });
+            totalPriceField.value = totalPrice.toFixed(2); // Update the total price field
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updateTotalPrice);
+        });
+
+        updateTotalPrice(); // Initial price update
+    });
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let basePrice = parseFloat(document.getElementById("basePrice").value);
+    let totalPriceField = document.getElementById("totalPrice");
+
+    function updateTotalPrice() {
+        let extraCost = 0;
+        document.querySelectorAll(".service-checkbox:checked").forEach(function(checkbox) {
+            extraCost += parseFloat(checkbox.getAttribute("data-price"));
+        });
+
+        let finalPrice = basePrice + extraCost;
+        totalPriceField.value = finalPrice;
+    }
+
+    document.querySelectorAll(".service-checkbox").forEach(function(checkbox) {
+        checkbox.addEventListener("change", updateTotalPrice);
+    });
+});
+</script>
+
+        </div>
+    </section>
+    {% include 'footer.html' %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const designType = document.getElementById("style");
+            const category = document.getElementById("category");
+
+            const residentialCategories = [
+                { value: "WholeHouse", text: "Full Residence" },
+                { value: "LivingRoom", text: "Living Room" },
+                { value: "BedRoom", text: "Bed Room" },
+                { value: "Kitchen", text: "Kitchen" },
+                { value: "StoreRoom", text: "Store Room" },
+                { value: "ChildRoom", text: "Child Room" },
+                { value: "StudyRoom", text: "Study Room" },
+                { value: "BathRoom", text: "Bath Room" }
+            ];
+
+            const commercialCategories = [{ value: "Office", text: "Office" }];
+
+            function updateCategoryOptions() {
+                category.innerHTML = "";
+                let selectedCategories = designType.value === "residential" ? residentialCategories : commercialCategories;
+                selectedCategories.forEach((item) => {
+                    const option = document.createElement("option");
+                    option.value = item.value;
+                    option.textContent = item.text;
+                    category.appendChild(option);
+                });
+            }
+
+            designType.addEventListener("change", updateCategoryOptions);
+            updateCategoryOptions();
+        });
+    </script>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Image View</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .full-image-container {
+            text-align: center;
+        }
+        .full-image {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .back-btn {
+            display: inline-block; /* Keeps button centered */
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: black;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            background-color: #333;
+            color: #bca88e;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="full-image-container">
+        <img src="/media/{{ package.package_img }}" class="full-image" alt="Full Image">
+        <br>
+        <a href="/categorywisepackage/{{ package.id }}" class="back-btn">Back to Packages</a>
+    </div>
+</body>
+</html>

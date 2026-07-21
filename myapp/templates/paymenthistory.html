@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f9;
+            color: #333;
+            height: auto; /* Change from 200px to auto */
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .managebooking {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .portfolio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #bca88e; /* Only the table background */
+            color: black; /* Adjust text color if needed */
+            font-weight: bold;
+            border: 1px solid black;
+        }
+
+        .portfolio-table th, .portfolio-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .portfolio-table th {
+            background-color: #8e6f4e; /* Darker shade for headers */
+            color: white;
+        }
+
+        .portfolio-table tr:nth-child(even) {
+            background-color: #d4b89b; /* Slightly lighter shade for alternate rows */
+        }
+
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            background-color: red;
+        }
+
+        .btn-view {
+            background-color: blue; /* Change to your preferred color */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            background-color: red;
+        }
+
+        .btn-delete {
+            background-color: black !important;
+            color: white !important;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: 1px solid white !important;
+            cursor: pointer;
+        }
+
+
+        .btn-delete:hover {
+            color: #bca88e !important;
+        }
+        @media screen and (max-width: 768px) {
+            .portfolio-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+<br>
+<br>
+<br>
+  <section class="managebooking">
+        <style>
+            .payment-history-container {
+                width: 100%;
+                margin: auto;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .payment-title {
+               text-align: center;
+                margin-bottom: 20px;
+                color: white;
+            }
+
+            .payment-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+                background-color: #bca88e; /* Table background */
+                color: black;
+                font-weight: bold;
+                border: 1px solid black;
+            }
+
+            .payment-table th, .payment-table td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                text-align: center;
+            }
+
+            .payment-table th {
+                background-color: #8e6f4e; /* Darker shade for headers */
+                color: white;
+            }
+
+            .payment-table tr:nth-child(even) {
+                background-color: #d4b89b; /* Alternating row color */
+            }
+
+            .status-paid {
+                background: #d4edda;
+                color: #155724;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+
+            .status-pending {
+                background: #fff3cd;
+                color: #856404;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+
+            .btn-receipt {
+                background-color: #007bff;
+                color: white;
+                padding: 6px 10px;
+                font-size: 14px;
+                border-radius: 4px;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .btn-receipt:hover {
+                background-color: #0056b3;
+            }
+
+            @media screen and (max-width: 768px) {
+                .payment-table {
+                    display: block;
+                    overflow-x: auto;
+                }
+            }
+        </style>
+
+        <div class="payment-history-container">
+            <h1 class="payment-title">Payment History</h1>
+        
+            <table class="payment-table">
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Client Name</th>
+                        <th>Total Amount</th>
+                        <th>Paid Amount (₹)</th>
+                        <th>Transaction ID</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ payment.booking.Client_Name }}</td>
+                        <td>₹ {{ payment.booking.totalamount }}</td>
+                         <td>₹ {{ payment.amount }}</td>
+                        <td>{{ payment.razorpay_order_id }}</td>
+                        <td>{{ payment.created_at }}</td>
+                        <td>
+                            {% if payment.status == "Completed" %}
+                                <span class="status-paid">✔ Paid</span>
+                            {% else %}
+                                <span class="status-pending">⏳ Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    
+  </section>
+    {% include 'footer.html' %}
+</body>
+</html>

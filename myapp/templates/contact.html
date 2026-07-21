@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .contact{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 20px;
+            background-image: url("../static/images/frombackimg.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .contact-form {
+            max-width: 600px;
+            color:#ccddff;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin:auto;
+            margin-top:80px;
+        }
+
+        .contact-form h3{
+            color:#ccddff;
+            margin-top:25px;
+            margin-bottom:25px;
+            text-align:center;
+            font-weight:bold;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid black !important; /* Ensures black border */
+            padding: 12px;
+            margin-bottom: 15px;
+            width: 100%;
+            box-shadow: none !important; /* Removes Bootstrap's default focus shadow */
+        }
+
+        .form-control:focus {
+            border: 1px solid black !important; /* Keeps black border on focus */
+            box-shadow: none !important; /* Ensures no green glow appears */
+            outline: none; /* Removes default focus outline */
+        }
+
+        .contact-form button {
+            background-color: #99bbff;
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            width: 100%;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+{% if messages %}
+{% for i in messages %}
+<script>alert("{{ i }}");</script>
+{% endfor %}
+{% endif %}
+  <section class="contact">
+    <div class="container">
+        <div class="contact-form">
+            <h3>Contact Us</h3>
+            <form action="\fetchcontactdata" method="post">
+                 {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" name="mno" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Your Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                </div>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  </section>
+    {% include 'footer.html' %}
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You!</title>
+    <style>
+       .thankyou{
+        min-height: 70vh;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+
+       }
+        .thank-you-container {
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            margin: 50px auto;
+        }
+        h1 {
+            font-size: 3em;
+            color: #007bff;
+            font-size: 24px;
+            line-height: 2;
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 1.2em;
+            color: white;
+            font-size: 18px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            opacity: 0.7;
+            border-radius: 50%;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh); opacity: 0; }
+        }
+         .back-btn {
+          display: block;
+          width: 200px;
+          margin: 20px auto; /* Centers the button horizontally */
+          padding: 10px;
+          background-color: white;
+          color: black;
+          text-align: center;
+          text-decoration: none;
+          border-radius: 5px;
+          font-size: 1rem;
+          font-weight: bold;
+          cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+    <section class="thankyou">
+    <div class="thank-you-container">
+        <h1>Thank you for your inquiry </h1>
+        <h4>Our Team will get back to you soon.</h4>
+
+        <a href="/" class="back-btn">Back to website</a></div>
+    <script>
+        function createConfetti() {
+            for (let i = 0; i < 100; i++) {
+                let confetti = document.createElement("div");
+                confetti.classList.add("confetti");
+                document.body.appendChild(confetti);
+
+                let colors = ["#ff0a54", "#ff477e", "#ff7096", "#ff85a1", "#ff99ac"];
+                let size = Math.random() * 10 + 5 + "px";
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + "vw";
+                confetti.style.top = "-10px";
+                confetti.style.width = size;
+                confetti.style.height = size;
+                confetti.style.animationDuration = Math.random() * 3 + 2 + "s";
+                confetti.style.animationDelay = Math.random() * 2 + "s";
+            }
+        }
+        createConfetti();
+    </script>
+        </section>
+{% include 'footer.html' %}
+</body>
+</html>

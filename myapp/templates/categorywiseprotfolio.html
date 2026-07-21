@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #333;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    /* Section Styles */
+    .section {
+      padding: 2rem;
+      margin: 0rem 0;
+    }
+
+    #portfolio {
+      background-color: black;
+      animation: fadeIn 2s ease-out;
+    }
+
+    /* Portfolio Items Grid */
+
+/* Portfolio Items Grid */
+    .portfolio-items {
+      width: 90%; /* Make sure it takes the full width of its container */
+              display: grid;
+              margin-left:90px;
+              margin-right:50px;
+              grid-template-columns: repeat(3, 1fr); /* 4 items per row */
+              gap: 1rem;
+              animation: slideUp 1.5s ease-out;
+              padding: 20px; /* Adding padding for spacing */
+              margin-top:50px;
+    }
+
+    .portfolio-item {
+      background-color:#bca88e;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .portfolio-item img {
+      height:400px;
+      width: 100%;
+      background-size:cover;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+      object-fit: cover;
+    }
+
+    .portfolio-item h3 {
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 0.5rem;
+      padding: 20px;
+      background:black;
+      border-radius: 5px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+
+    .portfolio-item h2 {
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 0.5rem;
+      padding: 20px;
+      background:black;
+      border-radius: 5px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .portfolio-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .portfolio-item:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+ {% include 'header.html' %}
+
+<!-- header-->
+   <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                    <ul class="navbar-nav ml-lg-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="about">About</a>
+                        </li>
+
+                       <li class="nav-item dropdown">
+                             {% for i in category %}
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Category <span class="fa fa-angle-down"></span>
+                            </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/categorywiseprotfolio">{{ i.portfolio }}</a>
+                        </div>
+                         {% endfor %}
+                        </li>
+
+                        </li>
+                        {% if request.session.log_name %}
+                        {% if request.session.log_role == "Client" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="showportfolio">Portfolio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="showpackage">Packages</a>
+                        </li>
+                         {% else %}
+                          <li class="nav-item">
+                            <a class="nav-link" href="addportfolio">AddPortfolio</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="addpackage">AddPackage</a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="contact">Contact Us</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a class="nav-link" href="\Register">Sign Up</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a class="nav-link" href="\login">Login</a>
+                        </li>
+
+                    </ul>
+                </div>
+
+
+  <!-- Portfolio Section -->
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                    {% if request.session.log_name %}
+
+                    <ul class="navbar-nav ml-lg-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="about">About</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Interior Solution <span class="fa fa-angle-down"></span>
+                            </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Residential</a>
+                            <a class="dropdown-item" href="#">Commercial</a>
+                        </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="addportfolio">AddPortfolio</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="showportfolio">Portfolio</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="addpackage">AddPackage</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="showpackage">Packages</a>
+                        </li>
+
+
+                        <li class="nav-item active">
+                            <a class="nav-link" href="contact">Contact Us</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a class="nav-link" href="\Register">Sign Up</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a class="nav-link" href="\login">Login</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <img src="static/Images/user.png"  height="30px" width="30px" alt="User">
+                            <span class="nav-link">{{ request.session.log_name }}</span>
+                        {% else %}
+                        <a class="nav-link" href="/login">Login</a>
+                        <a class="btn btn-outline-light me-2" href="/">Sign Up</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+
+<div class="box">
+  <section id="portfolio" class="section">
+    <div class="portfolio-items">
+      {% for i in data %}
+      <div class="portfolio-item">
+        <h3>{{i.designstyle}}</h3>
+          <a href="/singleportfolio/{{ i.id }}"><img src="/media/{{ i.sampleimage }}" alt="Portfolio 1"></a>
+        <h2>{{ i.Designer_Name }}</h2>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+      <!-- portfolio 2     -->
+<!--      <div class="portfolio-item">-->
+<!--        <img src="https://via.placeholder.com/300" alt="Project 2">-->
+
+<!--        <h3>Project 2</h3>-->
+<!--        <p>Project description goes here.</p>-->
+<!--      </div>-->
+<!--      <div class="portfolio-item">-->
+<!--        <img src="https://via.placeholder.com/300" alt="Project 3">-->
+
+        <!--         portfolio 3-->
+
+<!--        <h3>Project 3</h3>-->
+<!--        <p>Project description goes here.</p>-->
+<!--      </div>-->
+<!--      <div class="portfolio-item">-->
+<!--        <img src="https://via.placeholder.com/300" alt="Project 4">-->
+        <!--         portfolio 4-->
+
+<!--        <h3>Project 4</h3>-->
+<!--        <p>Project description goes here.</p>-->
+<!--      </div>-->
+    </div>
+  </section>
+ </div>
+
+  <!-- Footer -->
+<!--  <footer style="text-align: center; padding: 2rem;">-->
+<!--  </footer>-->
+ {% include 'footer.html' %}
+</body>
+</html>

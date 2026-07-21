@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Details</title>
+  <style>
+    .section {
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .single-portfolio {
+      align-items: center;
+      margin-left: 100px;
+      margin-top:95px;
+    }
+
+    .container1 {
+      max-width: 1100px;
+      margin: 50px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      background-color: #bca88e;
+    }
+
+    .heading, h3 {
+      height: 60px;
+      background-color: black;
+      text-align: center;
+      color: white;
+      border-radius: 5px;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+
+    .content {
+      display: flex;
+      align-items: center;
+      gap: 20px; /* Space between image and text */
+    }
+
+    .content img {
+      height: 300px;
+      width: 300px;
+      border-radius: 10px;
+      margin-top: 30px;
+      flex-shrink: 0; /* Prevent image from shrinking */
+      border: 3px solid black;
+    }
+
+    .desc {
+      flex-grow: 1; /* Let text take remaining space */
+      text-align: left;
+      border-radius: 10px;
+      padding: 15px;
+      color: white; /* Make text readable */
+    }
+
+    .desc p {
+      font-size: 1rem;
+      color: white;
+      margin: 5px 0;
+      font-weight: 500;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center; /* Centers the buttons horizontally */
+      gap: 20px; /* Adds spacing between buttons */
+      margin-top: 20px; /* Adjust spacing from content */
+    }
+
+    .back-btn {
+      display: inline-block;
+      width: 200px;
+      padding: 10px;
+      background-color: black;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+
+    .back-btn:hover {
+      background-color: #333;
+      color: #bca88e;
+    }
+
+  </style>
+</head>
+<body>
+{% include 'header.html' %}
+
+<section class="single-portfolio">
+  <div class="container1">
+    <h3 class="heading">Package Details</h3>
+    <div class="content">
+      <img src="/media/{{ data.package_img }}" class="image" alt="Portfolio Image">
+      <div class="desc">
+        <p><strong>Designer Name:</strong>{{ data.Designer_Name }}</p>
+        <p><strong>Package Design Style:</strong>{{ data.package_design_style }}</p>
+        <p><strong>Package Type:</strong>{{ data.package_type }}</p>
+        <p><strong>Package Category:</strong>{{ data.package_category }}</p>
+        <p><strong>BHKType:</strong>{{ data.BhkType }}</p>
+        <form method="post" action="\insertintobooking">
+        {% csrf_token %}
+        <p><strong>Package_Price:</strong>{{ data.package_price }}</p>
+        <p><strong>Time Duration:</strong>{{ data.time_duration }}</p>
+        <p><strong>Package Description:</strong>{{ data.package_desc }}</p>
+<!--        <p><strong>Extra Services:</strong>{{ data.ExtraServices }}</p>-->
+      <p><strong>Extra Services:</strong>
+      {% if data.ExtraServices %}
+            {{ data.ExtraServices }}
+      {% else %}
+          -
+      {% endif %}
+      </p>
+      </div>
+    </div>
+
+
+        <!-- Back button -->
+    <!-- Buttons side by side -->
+    <div class="button-container">
+      <a href="/showpackage" class="back-btn">Back to Package</a>
+      {% if request.session.log_role == "Client" %}
+      <a href="/booking/{{data.id}}" class="back-btn">Go To Booking</a>
+      {% endif %}
+    </div>
+</form>
+  </div>
+</section>
+{% include 'footer.html' %}
+</body>
+</html>

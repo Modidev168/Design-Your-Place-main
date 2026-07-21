@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer Portfolio Form</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      /* General Styling */
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.addportfolio-sec{
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    padding: 20px;
+    background-image: url("/static/images/frombackimg.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.box {
+    max-width: 700px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top:70px;
+}
+
+.header h1{
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 32px;
+    color: #ccddff;
+}
+
+p {
+    font-size: 16px;
+    color: #ccddff;
+}
+
+/* Form Styling */
+.portfolio-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 48%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ccddff;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input, textarea, select {
+     width: 100%;
+     padding: 12px;
+     margin: 10px 0 20px;
+     border: 1px solid #ccc;
+     border-radius: 5px;
+     box-sizing: border-box;
+}
+
+input:focus, textarea:focus {
+    border-color: #4CAF50;
+}
+
+textarea {
+    resize: vertical;
+    height: 80px;
+}
+
+.button {
+    background-color: #99bbff;
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+#work-upload{
+    color:#FFF;
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .form-group input, .form-group textarea {
+        font-size: 14px;
+    }
+
+    button {
+        font-size: 14px;
+    }
+}
+    </style>
+</head>
+<body>
+
+{% include 'header.html' %}
+
+{% if messages %}
+{% for i in messages %}
+<script>alert("{{ i }}");</script>
+{% endfor %}
+{% endif %}
+
+<section class="addportfolio-sec">
+    <div class="box">
+        <header class="header">
+            <h1>Designer Package Submission</h1>
+        </header>
+        <form class="package-form" action="/edit-package/{{editpackage.id}}/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-input">
+                <label for="name">Designer Name</label>
+                <input type="text" id="name" name="Designer_Name" value="{{ editpackage.Designer_Name }}" required/>
+            </div>
+        
+            <div class="form-input ">
+                <label for="style">Design Type</label>
+                <select id="style" name="Design_style" required>
+                    <option value="Residential" {% if editpackage.package_design_style == "Residential" %}selected{% endif %}>Residential</option>
+                    <option value="Commercial" {% if editpackage.package_design_style == "Commercial" %}selected{% endif %}>Commercial</option>
+                </select>
+            </div>
+        
+            <div class="form-input">
+                <label for="Package-type">Package Type:</label>
+                <input type="text" id="Package-type" name="Package-type-name" value="{{ editpackage.package_type }}" required>
+                <input type="hidden" id="Package-type" name="Package-type" value="{{ editpackage.package_type.id }}" required>
+            </div>
+        
+            <div class="form-input">
+                <label for="category">Package Category:</label>
+                <select id="category" name="category" required>
+                    <option value="Full Residence" {% if editpackage.package_category == "Full Residence" %}selected{% endif %}>Full Residence</option>
+                    <option value="LivingRoom" {% if editpackage.package_category == "LivingRoom" %}selected{% endif %}>Living Room</option>
+                    <option value="BedRoom" {% if editpackage.package_category == "BedRoom" %}selected{% endif %}>Bed Room</option>
+                </select>
+            </div>
+        
+            <div class="form-input">
+                <label for="bhkType">BHK Type</label>
+                <select id="bhkType" name="bhkType" required>
+                    <option value="1 BHK" {% if editpackage.BhkType == "1 BHK" %}selected{% endif %}>1 BHK</option>
+                    <option value="2 BHK" {% if editpackage.BhkType == "2 BHK" %}selected{% endif %}>2 BHK</option>
+                    <option value="3 BHK" {% if editpackage.BhkType == "3 BHK" %}selected{% endif %}>3 BHK</option>
+                    <option value="4 BHK or more" {% if editpackage.BhkType == "4 BHK or more" %}selected{% endif %}>4 BHK or more</option>
+                </select>
+            </div>
+        
+            <div class="form-input">
+                <label>Time Duration:</label>
+                <input type="text" id="time" name="duration" value="{{ editpackage.time_duration }}" required>
+            </div>
+        
+            <div class="form-input full-width">
+                <label for="desc-Package">Package Description:</label>
+                <textarea id="desc-Package" name="Package-desc" required>{{ editpackage.package_desc }}</textarea>
+            </div>
+        
+            <div class="form-input">
+                <label for="price">Price:</label>
+                <input type="text" id="price" name="price" value="{{ editpackage.package_price }}" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="work-upload">Upload a Sample Design:</label>
+                <input type="file" id="work-upload" name="Package-Images" accept=".jpg, .jpeg, .png">
+                <small style="color: #ccddff;">Only JPG and PNG files are allowed. (Current: {{ editpackage.package_img }})</small>
+            </div>
+         <div class="form-group full-width">
+            <label>Extra Services:</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" name="services" value="Color Combination" {% if "Color Combination" in editpackage.ExtraServices %}checked{% endif %}>
+                    Color Combination
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="services" value="WallPaper" {% if "WallPaper" in editpackage.ExtraServices %}checked{% endif %}>
+                    Wall Paper
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="services" value="POP Design" {% if "POP Design" in editpackage.ExtraServices %}checked{% endif %}>
+                    POP Design
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="services" value="Wardrobe Furniture" {% if "Wardrobe Furniture" in editpackage.ExtraServices %}checked{% endif %}>
+                    Wardrobe Furniture
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="services" value="Lighting Design" {% if "Lighting Design" in editpackage.ExtraServices %}checked{% endif %}>
+                    Lighting Design
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" name="services" value="Space Planning" {% if "Space Planning" in editpackage.ExtraServices %}checked{% endif %}>
+                    Space Planning
+                </label>
+            </div>
+        </div>
+           
+         
+         <div class="form-group full-width">
+                <input type="submit" value="Update Package" class="button">
+            </div>
+        </form>
+    </div>
+</section>
+{% include 'footer.html' %}
+
+<script>
+function updateCategories() {
+    var styleDropdown = document.getElementById("style");
+    var selectedOptionText = styleDropdown.options[styleDropdown.selectedIndex].text;
+    var categoryDropdown = document.getElementById("Category");
+
+    // Clear previous options
+    categoryDropdown.innerHTML = "<option value=''>Select a Category</option>";
+
+    var residentialCategories = [
+        { value: "WholeHouse", text: "Full Residence" },
+        { value: "LivingRoom", text: "Living Room" },
+        { value: "BedRoom", text: "Bed Room" },
+        { value: "Kitchen", text: "Kitchen" },
+        { value: "StoreRoom", text: "Store Room" },
+        { value: "ChildRoom", text: "Child Room" },
+        { value: "StudyRoom", text: "Study Room" },
+        { value: "BathRoom", text: "Bath Room" }
+    ];
+
+    var commercialCategories = [
+        { value: "Office", text: "Office" }
+    ];
+
+    var selectedCategories = [];
+
+    if (selectedOptionText === "Residential") {
+        selectedCategories = residentialCategories;
+    } else if (selectedOptionText === "Commercial") {
+        selectedCategories = commercialCategories;
+    }
+
+    selectedCategories.forEach(function(category) {
+        var option = document.createElement("option");
+        option.value = category.value;
+        option.textContent = category.text;
+        categoryDropdown.appendChild(option);
+    });
+}
+</script>
+
+</body>
+</html>

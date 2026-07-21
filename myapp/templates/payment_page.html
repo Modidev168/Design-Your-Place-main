@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h2>Complete Your Payment</h2>
+    <button id="pay-btn">Pay ₹{{ finalamount }}</button>
+
+    <script>
+        var options = {
+            "key": "{{ key }}",
+            "amount": "{{ amount }}",
+            "currency": "INR",
+            "name": "Booking Payment",
+            "description": "Pay 50% booking amount",
+            "order_id": "{{ order_id }}",
+            "handler": function (response){
+                fetch("/payment-success/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({
+                        "razorpay_payment_id": response.razorpay_payment_id,
+                        "razorpay_order_id": response.razorpay_order_id,
+                        "razorpay_signature": response.razorpay_signature
+                    })
+                }).then(response => window.location.href = "/featchbooking");
+            },
+            "theme": { "color": "#3399cc" }
+        };
+        
+        var rzp1 = new Razorpay(options);
+        document.getElementById("pay-btn").onclick = function(e){
+            rzp1.open();
+            e.preventDefault();
+        }
+    </script>
+</body>
+</html>

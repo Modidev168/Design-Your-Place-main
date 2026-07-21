@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commercial Interior Solution</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&display=swap');
+        * { box-sizing: border-box; font-family: "Georgia", serif; }
+        h2, h6, p { font-family: "Georgia", serif; font-weight: bold; }
+        h2, p { font-family: "Times New Roman", Times, serif; font-style: italic; }
+
+        /* Image Styling */
+        .right-img img {
+            border: 3px solid black;
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: moveDown 1s ease-in-out forwards;
+        }
+        @keyframes moveDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .right-img img:hover {
+            transform: translateY(10px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Text Animation (Left to Right) */
+        .left-cont {
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideIn 1s ease-in-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Full-width Video Section */
+        .video-section {
+            width: 1500px;
+            position: relative;
+            overflow: hidden;
+            background: black;
+            text-align:center;
+            margin:auto;
+        }
+        .video-section video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .video-overlay h2 {
+            font-size: 2.5rem;
+            font-style: normal;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <section class="w3l-text-6">
+        <div class="text-6-mian bottom-space py-5">
+            <div class="container py-lg-5 py-md-4 py-3">
+
+                <div class="row top-cont-grid align-items-center">
+                    <div class="col-lg-5 right-img sec-img-ab">
+                        <img src="static/images/office2.jpg" alt="Modern Office" class="img-responsive img-fluid" />
+                    </div>
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-6 left-cont mb-lg-0 mb-5">
+                        <h6>🏢 Smart & Efficient Commercial Spaces</h6>
+                        <h2>Transforming Workplaces with Style & Functionality</h2>
+                        <p>We design commercial interiors that enhance productivity and create a welcoming atmosphere. Whether it's an office, retail store, or hospitality venue, we bring your vision to life.</p>
+                    </div>
+                </div>
+
+                <div class="row top-cont-grid top-space align-items-center">
+                    <div class="col-lg-6 left-cont mb-lg-0 mb-5">
+                        <h6>🏬 Custom Interiors for Businesses</h6>
+                        <h2>Boost Your Brand with a Unique Space</h2>
+                        <p>Our commercial designs balance aesthetics and practicality, ensuring that every element contributes to a dynamic and efficient workspace.</p>
+                        <p>We integrate lighting, furniture, and decor to align with your brand identity.</p>
+                    </div>
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-5 right-img">
+                        <img src="static/images/office3.jpg" alt="Retail Store Design" class="img-responsive img-fluid" />
+                    </div>
+                </div>
+
+                <div class="row top-cont-grid align-items-center">
+                    <div class="col-lg-5 right-img sec-img-ab">
+                        <img src="static/images/office4.jpg" alt="Hotel Interior" class="img-responsive img-fluid" />
+                    </div>
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-6 left-cont mb-lg-0 mb-5">
+                        <h6>✨Our Services</h6>
+                        <h2>🏢 Commercial Interior Solutions</h2>
+                        <p>💼 Office Space Design</p>
+                        <p>We design modern and functional office spaces that boost productivity and reflect your brand identity. Our solutions focus on ergonomic layouts, smart storage, and stylish aesthetics to create a professional yet comfortable work environment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <section class="video-section">
+                <video autoplay muted loop>
+                <source src="static/videos/office.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+                <div class="video-overlay">
+                <h2></h2>
+                 </div>
+     </section>
+
+    {% include 'footer.html' %}
+</body>
+</html>

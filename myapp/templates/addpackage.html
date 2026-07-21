@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer Portfolio Form</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      /* General Styling */
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.addpackage-sec{
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    padding: 20px;
+    background-image: url("../static/images/frombackimg.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.box {
+    max-width: 700px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top:70px;
+}
+
+.header h1{
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 32px;
+    color: #ccddff;
+}
+
+p {
+    font-size: 16px;
+    color: #ccddff;
+}
+
+/* Form Styling */
+.package-form{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 48%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ccddff;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input, textarea, select {
+     width: 100%;
+     padding: 12px;
+     margin: 10px 0 20px;
+     border: 1px solid #ccc;
+     border-radius: 5px;
+     box-sizing: border-box;
+}
+
+input:focus, textarea:focus {
+    border-color: #4CAF50;
+}
+
+textarea {
+    resize: vertical;
+    height: 80px;
+}
+
+.button {
+    background-color: #99bbff;
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+button:focus {
+    outline: none;
+}
+
+#work-upload{
+    color:#FFF;
+}
+/* General Styling */
+/* Grid Layout: 2 checkboxes per row */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    gap: 10px; /* Spacing between checkboxes */
+    margin-top: 10px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #ccddff; /* Light color */
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.checkbox-item input {
+    margin-right: 10px;
+    transform: scale(1.2); /* Bigger checkboxes */
+    cursor: pointer;
+}
+
+/* Responsive Fix */
+@media screen and (max-width: 600px) {
+    .checkbox-group {
+        grid-template-columns: repeat(1, 1fr); /* 1 checkbox per row on small screens */
+    }
+}
+
+/* Fix for checkboxes appearing in odd positions */
+input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #99bbff;
+    border-radius: 4px;
+    display: inline-block;
+    position: relative;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #99bbff;
+    border: none;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✔';
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Responsive Fix */
+@media screen and (max-width: 600px) {
+    .checkbox-group {
+        grid-template-columns: repeat(1, 1fr); /* One per row on small screens */
+    }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .form-group input, .form-group textarea {
+        font-size: 14px;
+    }
+
+    button {
+        font-size: 14px;
+    }
+}
+    </style>
+</head>
+<body>
+
+{% include 'header.html' %}
+
+{% if messages %}
+{% for i in messages %}
+<script>alert("{{ i }}");</script>
+{% endfor %}
+{% endif %}
+
+<section class="addpackage-sec">
+    <div class="box">
+        <header class="header">
+            <h1>Designer Package Submission</h1>
+        </header>
+
+        <form  class="package-form" action="\fetchpackagedata" method="post" enctype="multipart/form-data">
+             {% csrf_token %}
+            <!-- About Yourself Input -->
+
+            <!-- About Yourself Input -->
+            <div class="form-group">
+                <label for="name">Designer Name</label>
+                <input type="name" id="name" name="Designer_Name" required/>
+            </div>
+
+            <!-- Design Style Input -->
+              <div class="form-group">
+                <label for="style">Design Type</label>
+                <select id="style" name="Design_style" required>
+                  <option value="Residential">Residential</option>
+                  <option value="Commercial">Commercial</option>
+                </select>
+              </div>
+
+            <!--Package Type-->
+            <div class="form-group">
+                    <label for="Package-type">Package Type:</label>
+                    <select id="Package-type" name="Package-type" required>
+                      {% for package in package %}
+                      <option value="{{package.id}}">{{package.Packcatname}}</option>
+                      {% endfor %}
+                    </select>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label for="category">Package Category:</label>
+                <select id="category" name="category" required>
+                  <option value="Full Residence">Full Residence</option>
+                  <option value="LivingRoom">Living Room</option>
+                  <option value="BedRoom">Bed Room</option>
+                  <option value="Kitchen">Kitchen</option>
+                  <option value="StoreRoom">Store Room</option>
+                  <option value="ChildRoom">Child Room</option>
+                  <option value="StudyRoom">Study Room</option>
+                  <option value="BathRoom">Bath Room</option>
+                  <option value="Office"> Office</option>
+                </select>
+            </div>
+
+            <!-- BHK TYpe -->
+             <div class="form-group">
+             <label for="bhkType" class="form-label">BHK Type</label>
+                <select class="form-select" id="bhkType" name="bhkType" required>
+                    <option value="" disabled selected>Select BHK Type</option>
+                    <option value="1 BHK">1 BHK</option>
+                    <option value="2 BHK">2 BHK</option>
+                    <option value="3 BHK">3 BHK</option>
+                </select>
+            </div>
+
+            <!-- Time Duration -->
+            <div class="form-group">
+              <label>Time Duration:</label>
+              <input type="text" id="time" name="duration" placeholder="Enter Time Duration " required>
+            </div>
+
+            <!--Package  Description-->
+             <div class="form-group full-width">
+                <label for="desc-Package">Package Description:</label>
+                <textarea id="desc-Package" name="Package-desc" placeholder="Enter Package Description" required></textarea>
+            </div>
+
+             <!-- Price-->
+            <div class="form-group">
+              <label for="price">Price:</label>
+              <input type="text" id="price" name="price" min="1" placeholder="Enter Package Price" required>
+            </div>
+
+            <!-- Upload Your Work Example -->
+            <div class="form-group ">
+                <label for="work-upload">Upload a Sample Design:</label>
+                <input type="file" id="work-upload" name="Package-Images" accept=".jpg, .jpeg, .png"  required>
+                <small style="color: #ccddff;">Only JPG and PNG files are allowed.</small>
+            </div>
+
+            <!-- Extra Services -->
+            <div class="form-group full-width">
+                <label>Extra Services:</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="services[]" value="Color Combination">
+                        Color Combination
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="services[]" value="WallPaper">
+                        Wall Paper
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="services[]" value="POP Design">
+                        POP Design
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="services[]" value="Furniture">
+                          Furniture
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="services[]" value="Lighting Design">
+                        Lighting Design
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="services[]" value="Space Planning">
+                        Space Planning
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group full-width">
+                <input type="submit" value="Submit" class="button ">
+            </div>
+        </form>
+    </div>
+</section>
+{% include 'footer.html' %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const designTypeSelect = document.getElementById("style");
+    const categorySelect = document.getElementById("category");
+
+    const residentialCategories = [
+        { value: "Full Residence", text: "Full Residence" },
+        { value: "LivingRoom", text: "Living Room" },
+        { value: "BedRoom", text: "Bed Room" },
+        { value: "Kitchen", text: "Kitchen" },
+        { value: "StoreRoom", text: "Store Room" },
+        { value: "ChildRoom", text: "Child Room" },
+        { value: "StudyRoom", text: "Study Room" },
+        { value: "BathRoom", text: "Bath Room" }
+    ];
+
+    const commercialCategories = [
+        { value: "Office", text: "Office" }
+    ];
+
+    function updateCategoryOptions() {
+        categorySelect.innerHTML = ""; // Clear current options
+
+        let categoriesToShow = designTypeSelect.value === "Residential"
+            ? residentialCategories
+            : commercialCategories;
+
+        categoriesToShow.forEach(cat => {
+            let option = document.createElement("option");
+            option.value = cat.value;
+            option.textContent = cat.text;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    designTypeSelect.addEventListener("change", updateCategoryOptions);
+
+    // Initialize the category options based on default selection
+    updateCategoryOptions();
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .register-sec{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 20px;
+            background-image: url("../static/images/frombackimg.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .register-wrapper {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 520px;
+            padding: 40px;
+            color: #fff;
+            margin-top:60px;
+        }
+
+        .register-wrapper h2 {
+            color: #ccddff;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #ccddff;
+            margin-bottom: 6px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            padding-top:20px;
+        }
+
+        .action-group {
+            margin-top: 20px;
+        }
+
+        button.register-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #99bbff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button.register-btn:hover {
+            background-color: #66aaff;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: center;
+            color: #ccddff;
+        }
+
+
+        .login-link a {
+            color: #ccddff;
+            text-decoration: none;
+            font-weight:bold;
+        }
+
+         .login-link p {
+            color: #ccddff;
+            text-decoration: none;
+            font-weight:bold;
+        }
+
+        .login-link a:hover {
+            color: #ccddff;
+        }
+    </style>
+
+   <script>
+        function validatePasswords() {
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return false;
+            }
+            return true;
+        }
+
+        function togglePasswordVisibility(id) {
+            var input = document.getElementById(id);
+            var icon = document.getElementById(id + '-icon');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.textContent = "👁‍🗨";
+            } else {
+                input.type = "password";
+                icon.textContent = "👁‍🗨";
+            }
+        }
+    </script>
+</head>
+<body>
+{% include 'header.html' %}
+<section class="register-sec">
+    <div class="register-wrapper">
+        <h2>Create an Account</h2>
+        <form action="\fetchregisterdata" method="post" enctype="multipart/form-data" onsubmit="return validatePasswords()">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="input-group">
+                <label for="phone">Phone No</label>
+                <input type="tel" id="phone" name="phone" maxlength="10" pattern="\d{10}"  placeholder="Enter your Phone number" required>
+            </div>
+
+            <div class="input-group password-container">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" pattern="[A-Za-z\d@$!%*?&]{8,12}" placeholder="Enter your Password" required>
+                <span class="toggle-password" id="password-icon" onclick="togglePasswordVisibility('password')">👁‍🗨</span>
+            </div>
+
+            <div class="input-group password-container">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" name="confirmpassword" id="confirmPassword" pattern="[A-Za-z\d@$!%*?&]{8,12}" placeholder="Enter your Confirm Password" required>
+                <span class="toggle-password" id="confirmPassword-icon" onclick="togglePasswordVisibility('confirmPassword')">👁‍🗨</span>
+            </div>
+
+            <div class="input-group">
+                <label for="Identy-Card">Identity Card</label>
+                <input type="file" id="Identy-Card" name="Identy_Card" accept="image/*" required>
+            </div>
+
+            <div class="input-group">
+                <label for="role">Select Role</label>
+                <select id="role" name="role" required>
+                    <option value="Client">Client</option>
+                    <option value="Designer">Designer</option>
+                </select>
+            </div>
+
+            <div class="action-group">
+                <button type="submit" class="register-btn">Sign Up</button>
+            </div>
+        </form>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="\login">Login</a></p>
+        </div>
+    </div>
+</section>
+{% include 'footer.html' %}
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer Portfolio Form</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+         /* General Styling */
+        * {
+          box-sizing: border-box;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+          margin: 0;
+          padding: 0;
+        }
+
+        .rating-sec{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            padding: 50px 20px;
+            background-image: url("../static/images/frombackimg.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .review-card {
+            max-width: 500px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .review-card h3{
+          text-align: center;
+          margin-bottom: 30px;
+          font-size: 40px;
+          color: #ccddff;
+        }
+
+        .stars {
+            font-size: 32px;
+            margin: 15px 0;
+        }
+        .star {
+            cursor: pointer;
+            color: lightgray;
+        }
+        .star.active {
+            color: gold;
+        }
+
+        #rating-value{
+          color: #ccddff;
+          font-weight:bold;
+          padding-bottom:20px;
+          font-size: 20px;
+        }
+
+        input, textarea {
+            width: 100%;
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .submit-btn {
+            background-color: #99bbff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+            width: 100%;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+{% include 'header.html' %}
+
+{% if messages %}
+{% for i in messages %}
+<script>alert("{{ i }}");</script>
+{% endfor %}
+{% endif %}
+
+<section class="rating-sec">
+    <div class="review-card">
+        <h3>Leave a Review</h3>
+        <form method="post" action="\fetchratingpagedata">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Enter your name" value="{{request.session.log_name}}"  readonly required>
+
+            <!-- Hidden input to store rating value -->
+            <input type="hidden" id="rating" name="rating" required>
+
+            <div class="stars">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+
+            <p id="rating-value"><strong>0 out of 5</strong></p>
+
+            <input type="hidden" name="star" id="rating-input">
+
+            <textarea name="review" placeholder="Write your review here..." required></textarea>
+            <button type="submit" class="submit-btn">Submit Review</button>
+        </form>
+    </div>
+
+    <script>
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating-input');  // Hidden input
+    const ratingValue = document.getElementById('rating-value');
+
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const value = star.getAttribute('data-value');
+
+            stars.forEach(s => s.classList.remove('active'));
+            for (let i = 0; i < value; i++) {
+                stars[i].classList.add('active');
+            }
+
+            ratingValue.innerHTML = `<strong>${value} out of 5</strong>`;
+            ratingInput.value = value;  // ✅ Save rating in hidden input
+        });
+    });
+</script>
+
+</section>
+
+{% include 'footer.html' %}
+</body>
+</html>

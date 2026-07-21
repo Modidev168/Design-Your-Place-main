@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f9;
+            color: #333;
+            height: auto; /* Change from 200px to auto */
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .managepackage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .portfolio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #bca88e; /* Only the table background */
+            color: black; /* Adjust text color if needed */
+            font-weight: bold;
+            border: 1px solid black;
+
+        }
+
+        .portfolio-table th,
+        .portfolio-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .portfolio-table th {
+            background-color: #8e6f4e; /* Darker shade for headers */
+            color: white;
+        }
+
+        .portfolio-table tr:nth-child(even) {
+            background-color: #d4b89b; /* Slightly lighter shade for alternate rows */
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            background-color: red;
+        }
+
+        .btn-edit {
+            background-color: black !important;
+            color: white !important;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: 1px solid white !important;
+            cursor: pointer;
+            width:85px;
+        }
+
+        .btn-delete {
+            background-color: black !important;
+            color: white !important;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: 1px solid white !important;
+            cursor: pointer;
+            width:85px;
+        }
+
+        .btn-delete:hover {
+            color: #bca88e !important;
+        }
+
+        .btn-edit:hover {
+            color: #bca88e !important;
+        }
+
+        @media screen and (max-width: 768px) {
+            .portfolio-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+  <section class="managepackage">
+        <h1>Show Review </h1>
+
+    <table class="portfolio-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client Name</th>
+                <th>Star</th>
+                <th>Review / comment </th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Example portfolio items -->
+             {% for review in reviews %}
+
+            <tr>
+                <td>{{ review.id }}</td>
+                <td> {{ review.name }} </td>
+                <td>
+                     <div class="rating">
+                            {% for _ in review.star_range %}
+                                ⭐
+                            {% endfor %}
+                        </div>
+                </td>
+                <td>{{ review.review }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  </section>
+    {% include 'footer.html' %}
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residential Interior Solution</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&display=swap');
+      * {
+    box-sizing: border-box;
+    font-family: "Georgia", serif;
+    }
+
+         h2, h6, p {
+            font-family: "Georgia", serif;
+            font-weight:bold;
+        }
+
+        h2{
+            font-family: "Times New Roman", Times, serif; /* Serif font */
+            font-style: italic; /* Italic style */
+        }
+
+        p{
+            font-family: "Times New Roman", Times, serif; /* Serif font */
+            font-style: italic; /* Italic style */
+        }
+
+
+        #w3lDemoBar.w3l-demo-bar {
+          top: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 9999;
+          padding: 40px 5px;
+          padding-top:70px;
+          margin-bottom: 70px;
+          background: #0D1326;
+          border-top-left-radius: 9px;
+          border-bottom-left-radius: 9px;
+        }
+
+        #w3lDemoBar.w3l-demo-bar a {
+          display: block;
+          color: #e6ebff;
+          text-decoration: none;
+          line-height: 24px;
+          opacity: .6;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        #w3lDemoBar.w3l-demo-bar span.w3l-icon {
+          display: block;
+        }
+
+        #w3lDemoBar.w3l-demo-bar a:hover {
+          opacity: 1;
+        }
+
+        #w3lDemoBar.w3l-demo-bar .w3l-icon svg {
+          color: #e6ebff;
+        }
+        #w3lDemoBar.w3l-demo-bar .responsive-icons {
+          margin-top: 30px;
+          border-top: 1px solid #41414d;
+          padding-top: 40px;
+        }
+        #w3lDemoBar.w3l-demo-bar .demo-btns {
+          border-top: 1px solid #41414d;
+          padding-top: 30px;
+        }
+        #w3lDemoBar.w3l-demo-bar .responsive-icons a span.fa {
+          font-size: 26px;
+        }
+        #w3lDemoBar.w3l-demo-bar .no-margin-bottom{
+          margin-bottom:0;
+        }
+        .toggle-right-sidebar span {
+          background: #0D1326;
+          width: 50px;
+          height: 50px;
+          line-height: 50px;
+          text-align: center;
+          color: #e6ebff;
+          border-radius: 50px;
+          font-size: 26px;
+          cursor: pointer;
+          opacity: .5;
+        }
+        .pull-right {
+          float: right;
+          position: fixed;
+          right: 0px;
+          top: 70px;
+          width: 90px;
+          z-index: 99999;
+          text-align: center;
+        }
+        /* ============================================================
+        RIGHT SIDEBAR SECTION
+        ============================================================ */
+
+        #right-sidebar {
+          width: 90px;
+          position: fixed;
+          height: 100%;
+          z-index: 1000;
+          right: 0px;
+          top: 0;
+          margin-top: 60px;
+          -webkit-transition: all .5s ease-in-out;
+          -moz-transition: all .5s ease-in-out;
+          -o-transition: all .5s ease-in-out;
+          transition: all .5s ease-in-out;
+          overflow-y: auto;
+        }
+
+
+        /* ============================================================
+        RIGHT SIDEBAR TOGGLE SECTION
+        ============================================================ */
+
+        .hide-right-bar-notifications {
+          margin-right: -300px !important;
+          -webkit-transition: all .3s ease-in-out;
+          -moz-transition: all .3s ease-in-out;
+          -o-transition: all .3s ease-in-out;
+          transition: all .3s ease-in-out;
+        }
+
+
+
+        @media (max-width: 992px) {
+          #w3lDemoBar.w3l-demo-bar a.desktop-mode{
+              display: none;
+
+          }
+        }
+        @media (max-width: 767px) {
+          #w3lDemoBar.w3l-demo-bar a.tablet-mode{
+              display: none;
+
+          }
+        }
+        @media (max-width: 568px) {
+          #w3lDemoBar.w3l-demo-bar a.mobile-mode{
+              display: none;
+          }
+          #w3lDemoBar.w3l-demo-bar .responsive-icons {
+              margin-top: 0px;
+              border-top: none;
+              padding-top: 0px;
+          }
+          #right-sidebar,.pull-right {
+              width: 90px;
+          }
+          #w3lDemoBar.w3l-demo-bar .no-margin-bottom-mobile{
+              margin-bottom: 0;
+          }
+        }
+
+        /* Image Animation (Top to Bottom) */
+        .right-img img {
+            border: 3px solid black;
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+            position: relative;
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: moveDown 1s ease-in-out forwards;
+        }
+
+        @keyframes moveDown {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Hover Effect */
+        .right-img img:hover {
+            transform: translateY(10px);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Text Animation (Left to Right) */
+        .left-cont {
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideIn 1s ease-in-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile Responsive Fix */
+        @media (max-width: 768px) {
+            .right-img img {
+                width: 100%;
+                height: auto;
+                border: 2px solid black;
+            }
+            .left-cont {
+                text-align: center;
+                padding: 10px;
+            }
+        }
+
+     .nav-buttons {
+            margin-top: 0px;
+            margin-bottom: 200px;
+        }
+
+    .nav-buttons,btn1{
+        padding-top:50px;
+        margin-left:500px;
+    }
+    .nav-buttons,btn2{
+        margin-right:600px;
+    }
+        /* Full-width Video Section */
+        .video-section {
+            width: 1500px;
+            position: relative;
+            overflow: hidden;
+            background: black;
+            text-align:center;
+            margin:auto;
+        }
+        .video-section video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .video-overlay h2 {
+            font-size: 2.5rem;
+            font-style: normal;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+ {% include 'header.html' %}
+     <!-- image with text section -->
+    <section class="w3l-text-6">
+        <div class="text-6-mian bottom-space py-5">
+            <div class="container py-lg-5 py-md-4 py-3">
+
+                <div class="row top-cont-grid align-items-center">
+                    <div class="col-lg-5 right-img sec-img-ab">
+                        <img src="static/images/dream house.jpg" alt="" class="img-responsive img-fluid" />
+                    </div>
+                    <div class="col-lg-1">
+
+                    </div>
+                    <div class="col-lg-6 left-cont mb-lg-0 mb-5">
+                        <h6>✨ Elegant & Functional Interiors</h6>
+                     <h2>Modern & Classic Designs for Every Space</h2>
+                    <p>Our residential interior solutions focus on creating stylish, comfortable, and functional living spaces. We design interiors that match your personality and enhance your home's aesthetics</p>
+                    </div>
+                </div>
+
+                <div class="row top-cont-grid top-space align-items-center">
+                    <div class="col-lg-6 left-cont mb-lg-0 mb-5">
+                       <h6>🏡 Best Designs</h6>
+                        <h2>Your Dream Home is Closer Than You Think</h2>
+                        <p>We specialize in turning ordinary spaces into extraordinary homes. With our expertise, you can achieve the perfect balance between aesthetics and functionality.</p>
+                        <p>Every element, from lighting to textures, is chosen to create a harmonious ambiance.</p>
+                    </div>
+                    <div class="col-lg-1">
+
+                    </div>
+                    <div class="col-lg-5 right-img">
+                        <img src="static/images/house1.jpg" alt="" class="img-responsive img-fluid" />
+                    </div>
+                </div>
+
+                <br>
+                <br>
+
+                <div class="row top-cont-grid align-items-center">
+                    <div class="col-lg-5 right-img sec-img-ab">
+                        <img src="static/images/home1.jpg" alt="" class="img-responsive img-fluid" />
+                    </div>
+                    <div class="col-lg-1">
+
+                    </div>
+                    <div class="col-lg-6 left-cont mb-lg-0 mb-5">
+                        <h6>✨Services</h6>
+                   <h2>🛠Our Interior Solutions</h2>
+                            <p>🏠 Full Home Interior Designing</p>
+                            <p>🛋 Living Room & Lounge Styling</p>
+                            <p>🍽 Modular Kitchen Setup</p>
+                            <p>🛏 Customized Bedroom Designs</p>
+                            <p>🚿 Luxurious Bathroom Remodeling</p>
+                            <p>🎭 Wall Art & Decor Ideas</p>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </section>
+    <!-- image with text section -->
+<div style="margin: 8px auto; display: block; text-align:center;">
+
+<!---728x90--->
+
+</div>
+  <section class="video-section">
+                <video autoplay muted loop>
+                <source src="static/videos/home.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+                </video>
+                <div class="video-overlay">
+                <h2></h2>
+                 </div>
+     </section>
+ <!-- jQuery Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Magnific Popup CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
+
+<!-- Magnific Popup JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.popup-with-zoom-anim').magnificPopup({
+            type: 'iframe',
+            mainClass: 'mfp-fade',
+            removalDelay: 300,
+            preloader: false,
+            fixedContentPos: false
+        });
+    });
+</script>
+
+ <script>
+    $(document).ready(function () {
+        $('.popup-with-zoom-anim').magnificPopup({
+            type: 'inline', // Use "inline" for local videos
+            mainClass: 'mfp-fade',
+            removalDelay: 300,
+            preloader: false,
+            fixedContentPos: false
+        });
+    });
+</script>
+
+
+ {% include 'footer.html' %}
+</body>
+</html>

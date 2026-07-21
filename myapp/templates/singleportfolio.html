@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Details</title>
+  <style>
+    .section {
+      padding: 2rem;
+      margin: 0rem 0;
+    }
+
+    .single-portfolio {
+      align-items: center;
+      margin-left: 100px;
+       margin-top:100px;
+    }
+
+    .container1 {
+      max-width: 1200px;
+      margin: 50px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      background-color: #bca88e;
+    }
+
+    .heading, h3 {
+      height: 60px;
+      background-color: black;
+      text-align: center;
+      color: white;
+      border-radius: 5px;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+
+    .content {
+      display: flex;
+      align-items: center;
+      gap: 20px; /* Space between image and text */
+    }
+
+    .content img {
+      height: 300px;
+      width: 300px;
+      border-radius: 10px;
+      margin-top: 30px;
+      flex-shrink: 0; /* Prevent image from shrinking */
+      border: 3px solid black;
+    }
+
+    .desc {
+      flex-grow: 1; /* Let text take remaining space */
+      text-align: left;
+      border-radius: 10px;
+      padding: 15px;
+      color: white; /* Make text readable */
+    }
+
+    .desc p {
+      font-size: 1rem;
+      color: white;
+      margin: 5px 0;
+      font-weight: 500;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        margin-top: 20px; /* Add some spacing from the content */
+    }
+
+    .back-btn {
+        display: inline-block; /* Makes them appear side by side */
+        background-color: black; /* Button color */
+        color: white; /* Text color */
+        text-decoration: none; /* Remove underline */
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-right: 10px; /* Space between buttons */
+        font-size: 16px;
+        text-align: center;
+        font-weight:bold;
+         border: 2px solid white;
+    }
+
+    .back-btn:hover {
+        color: #bca88e; /* Slightly darker shade on hover */
+    }
+
+  </style>
+</head>
+<body>
+{% include 'header.html' %}
+<section class="single-portfolio">
+  <div class="container1">
+    <h3 class="heading">Portfolio Details</h3>
+    <div class="content">
+      <a href="/showpackage"><img src="/media/{{ data.sampleimage }}" class="image" alt="Portfolio Image"></a>
+      <div class="desc">
+        <p><strong>Designer Name:</strong>{{ data.Designer_Name }}</p>
+        <p><strong>About Yourself:</strong>{{ data.aboutyourself }}</p>
+        <p><strong>Preferred Design Style:</strong>{{ data.designstyle }}</p>
+<!--        <p><strong>Category:</strong>{{ data.Portfoliocategory }}</p>-->
+        <p><strong>Designer Skills:</strong>{{ data.designerskill }}</p>
+        <p><strong>Experience and Specialties:</strong>{{ data.experience }}</p>
+      </div>
+    </div>
+
+     <!-- Back button -->
+     <div class="button-container">
+        <a href="/showportfolio" class="back-btn">Back to Portfolio</a>
+        {% if request.session.log_name %}
+        <a href="/showpackage" class="back-btn">Go to Packages</a>
+        {% else %}
+        <a href="/showpackage" class="back-btn">Go to Packages</a>
+        {% endif %}
+    </div>
+
+  </div>
+</section>
+{% include 'footer.html' %}
+</body>
+</html>

@@ -789,7 +789,4 @@ def showreview(request):
     return render(request, "showreview.html",context)
 
 
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# add some comments to explain the purpose of each view function and the overall flow of the application. This will help future developers understand the code better.
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

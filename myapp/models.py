@@ -151,3 +151,9 @@ class Payment(models.Model):
     razorpay_signature = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=20, default="Pending")
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# add some comments to explain the purpose of each view function and the overall flow of the application. This will help future developers understand the code better.
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

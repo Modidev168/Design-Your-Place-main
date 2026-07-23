@@ -290,6 +290,7 @@ button,
 [type="reset"],
 [type="submit"] {
   -webkit-appearance: button;
+  appearance: button;
 }
 
 button:not(:disabled),
@@ -318,6 +319,7 @@ input[type="time"],
 input[type="datetime-local"],
 input[type="month"] {
   -webkit-appearance: listbox;
+  appearance: listbox;
 }
 
 textarea {
@@ -361,10 +363,6 @@ progress {
 
 [type="search"] {
   outline-offset: -2px;
-}
-
-[type="search"]::-webkit-search-decoration {
-  
 }
 
 ::-webkit-file-upload-button {
@@ -11129,27 +11127,27 @@ a.text-dark:focus {
 }
 
 .fa-rotate-90 {
-  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
+  /* -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)"; */
   transform: rotate(90deg);
 }
 
 .fa-rotate-180 {
-  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
+  /* -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"; */
   transform: rotate(180deg);
 }
 
 .fa-rotate-270 {
-  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";
+  /* -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)"; */
   transform: rotate(270deg);
 }
 
 .fa-flip-horizontal {
-  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";
+  /* -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)"; */
   transform: scale(-1, 1);
 }
 
 .fa-flip-vertical {
-  -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";
+  /* -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)"; */
   transform: scale(1, -1);
 }
 
@@ -16549,7 +16547,7 @@ h6.same-style-top {
   margin-bottom: 10px;
   text-transform: uppercase;
   font-weight: 400;
-  cursive: Brush Script MT, Comic Sans MS
+  font-family: Brush Script MT, Comic Sans MS;
   padding: 8px 8px 8px 15px;
   border-left: 2px solid var(--primary-color);
 }

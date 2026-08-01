@@ -19,7 +19,7 @@ class registermodel(models.Model):  # register model
 
     def _str_(self):  # return a name
         return self.fullname
-        return self.Role  #change
+        
 
 
 class Packagecategory(models.Model):

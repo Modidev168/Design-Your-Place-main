@@ -5,12 +5,15 @@ from multiselectfield import MultiSelectField
 # Create your models here.
 class registermodel(models.Model):  # register model
     fullname = models.CharField(max_length=20)
-    email = models.EmailField()
-    password = models.CharField(max_length=10)
-    confirmpassword = models.CharField(max_length=10)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=200)
+    # confirmpassword = models.CharField(max_length=200)
     phone = models.BigIntegerField()
     Identy_Card = models.ImageField(upload_to="photos", default="")
     Role = models.CharField(max_length=10, null=False, default="designer")
+
+    reset_otp = models.CharField(max_length=6, blank=True, null=True)
+    otp_created_at = models.DateTimeField(blank=True, null=True)
 
     def identy_card(self):  # store a image , this fun name is same as in admin file
         return mark_safe('<img src="{}" width="100"/>'.format(self.Identy_Card.url))

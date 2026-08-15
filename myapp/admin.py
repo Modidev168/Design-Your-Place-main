@@ -4,7 +4,7 @@ from .models import *
 # Register your models here.
 
 class showregistermodel(admin.ModelAdmin):
-    list_display = ["id","fullname","email","password","confirmpassword","phone","identy_card","Role"]
+    list_display = ["id","fullname","email","password","phone","identy_card","Role"]
 
 admin.site.register(registermodel,showregistermodel)
 

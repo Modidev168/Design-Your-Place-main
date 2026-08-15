@@ -21,11 +21,15 @@ from django.conf import settings
 from myapp import views
 
 urlpatterns = [
-path("admin/", admin.site.urls),
-    path("Register", views.registerpage),
-    path("login", views.loginpage),
-    path("forgotpwd", views.forgotpwd),
-    path("forgotpassword", views.forgotpassword),
+    path("admin/", admin.site.urls),
+    path("login", views.loginpage,name='login'),
+    # path("forgotpwd", views.forgotpwd),
+    # path("forgotpassword", views.forgotpassword),
+
+    path("Register", views.registerpage, name="registerpage"),
+    path("forgot-password/", views.forgot_password, name="forgot_password"),
+    path("verify-otp/", views.verify_otp, name="verify_otp"),
+    path("new-password/", views.new_password, name="new_password"),
     path("logout",views.logout),
     path("fetchregisterdata", views.fetchregisterdata),
     path("checklogindata", views.checklogindata),

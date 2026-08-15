@@ -163,7 +163,8 @@
     <div class="login-wrapper">
         <div class="login-container">
             <h2 class="name">Welcome Back!</h2>
-            <form action="\checklogindata" method="post">
+            
+            <form action="\checklogindata" method="POST">
                 {% csrf_token %}
                 <div class="input-group">
                     <label for="email"><b>Email</b></label>
@@ -179,7 +180,7 @@
                 <div class="action-group">
                     <button type="submit" class="login-btn"><b>Login</b></button>
                     <div class="forgot-password">
-                        <a href="/forgotpwd"><b>Forget Password?</b></a>
+                        <a href="{% url 'forgot_password' %}"><b>Forget Password?</b></a>
                     </div>
                 </div>
             </form>
@@ -207,5 +208,5 @@
 </body>
 </html>
 
-{% comment %} {% comment %} # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+{% comment %}# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # {% endcomment %}

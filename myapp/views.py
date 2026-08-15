@@ -1,9 +1,20 @@
 from calendar import month
 from os import remove
-
+from django.http import request
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import *
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+from datetime import timedelta
+import random
+from django.contrib.auth.hashers import make_password
+
 
 
 def base():
@@ -26,8 +37,8 @@ def registerpage(request):
 def fetchregisterdata(request):  # insert data into model
     fullname = request.POST.get("fullname")
     email = request.POST.get("email")
-    password = request.POST.get("password")
-    confirmpassword = request.POST.get("confirmpassword")
+    password = make_password(request.POST.get("password"))
+    confirmpassword = make_password(request.POST.get("confirmpassword"))
     phone = request.POST.get("phone")
     identyCard = request.FILES["Identy_Card"]
     role = request.POST["role"]
@@ -57,44 +68,37 @@ def loginpage(request):
 
 
 # register and login is same or not check to email and password
+from django.contrib.auth.hashers import check_password
+
 def checklogindata(request):
+
     useremail = request.POST.get("email")
     userpassword = request.POST.get("password")
 
-    print(useremail)
-    print(userpassword)
-    print("Success")
-    # query to check data into model
-
     try:
-        userdata = registermodel.objects.get(email=useremail, password=userpassword)  # select query
-        print(userdata)
-        print("success")
+        userdata = registermodel.objects.get(email=useremail)
 
-        # Store data into Session
+    except registermodel.DoesNotExist:
 
-        request.session["log_id"] = userdata.id  # Keyword after . is field name
+        messages.error(request, "Invalid email or password")
+        return render(request, "login.html")
+
+
+    if check_password(userpassword, userdata.password):
+
+        request.session["log_id"] = userdata.id
         request.session["log_name"] = userdata.fullname
         request.session["log_email"] = userdata.email
         request.session["log_role"] = userdata.Role
 
-        print("Session name=", request.session["log_name"])
+        print("Login Successful")
 
-    except:
-        print("failure")
-        userdata = None
+        return redirect("showportfolio")
 
-        # navigation based on query result
+    else:
 
-    if userdata is not None:
-        return redirect("showportfolio")  # Ensure "showpackage" is a named URL in urls.py
-
-    # Authentication failed case
-    print("Invalid email or password")
-    messages.error(request, "Invalid email or password")
-
-    return render(request, "login.html")
-
+        messages.error(request, "Invalid email or password")
+        return render(request, "login.html")
 
 def logout(request):
     context = base()
@@ -696,81 +700,243 @@ def edit_package(request, package_id):
     return render(request, "editpackage.html", {"editpackage": package})
 
 
-def forgotpwd(request):
-    context = base()
-    print(context)
-    return render(request, "forgotpassword.html",context)
+# def forgotpwd(request):
+#     context = base()
+#     print(context)
+#     return render(request, "forgotpassword.html",context)
 
 
-def forgotpassword(request):
-    if request.method == 'POST':
-        username = request.POST.get('email')
+# def forgotpassword(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('email')
+
+#         try:
+#             user = registermodel.objects.get(email=username)
+
+#         except registermodel.DoesNotExist:
+#             user = None
+
+#         if user is not None:
+#             #################### Password Generation ##########################
+#             import random
+#             letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+#                        't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+#                        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+#             numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+#             symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
+
+#             nr_letters = 6
+#             nr_symbols = 1
+#             nr_numbers = 3
+#             password_list = []
+
+#             for char in range(1, nr_letters + 1):
+#                 password_list.append(random.choice(letters))
+
+#             for char in range(1, nr_symbols + 1):
+#                 password_list += random.choice(symbols)
+
+#             for char in range(1, nr_numbers + 1):
+#                 password_list += random.choice(numbers)
+
+#             print(password_list)
+#             random.shuffle(password_list)
+#             print(password_list)
+
+#             password = ""  # we will get final password in this var.
+#             for char in password_list:
+#                 password += char
+
+#             ##############################################################
+
+#             msg = "hello here it is your new password  " + password  # this variable will be passed as message in mail
+
+#             ############ code for sending mail ########################
+
+#             from django.core.mail import send_mail
+
+#             send_mail(
+#                 'Your New Password',
+#                 msg,
+#                 'modidev747@gmail.com',
+#                 [username],
+#                 fail_silently=False,
+#             )
+
+#             # now update the password in model
+#             cuser = registermodel.objects.get(email=username)
+#             cuser.password = password
+#             cuser.confirmpassword = password
+#             cuser.save(update_fields=['password'])
+
+#             print('Mail sent')
+#             messages.info(request, 'mail is sent successfully to your registered email')
+#             return redirect(indexpage)
+#         else:
+#             messages.info(request, 'This account does not exist')
+#     return redirect(indexpage)
+
+
+def forgot_password(request):
+
+    if request.method == "POST":
+
+        email = request.POST.get("email")
 
         try:
-            user = registermodel.objects.get(email=username)
+            user = registermodel.objects.get(email=email)
 
         except registermodel.DoesNotExist:
-            user = None
+            messages.error(request, "Email not registered")
+            return redirect("forgot_password")
 
-        if user is not None:
-            #################### Password Generation ##########################
-            import random
-            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-                       't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-                       'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-            numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-            symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
+        otp = str(random.randint(100000, 999999))
 
-            nr_letters = 6
-            nr_symbols = 1
-            nr_numbers = 3
-            password_list = []
+        user.reset_otp = otp
+        user.otp_created_at = timezone.now()
+        user.save()
 
-            for char in range(1, nr_letters + 1):
-                password_list.append(random.choice(letters))
+        send_mail(
+            "Password Reset OTP",
+            f"Your OTP is: {otp}\n\nThis OTP is valid for 5 minutes.",
+            "modidev747@gmail.com",
+            [email],
+            fail_silently=False,
+        )
 
-            for char in range(1, nr_symbols + 1):
-                password_list += random.choice(symbols)
+        request.session["reset_email"] = email
 
-            for char in range(1, nr_numbers + 1):
-                password_list += random.choice(numbers)
+        messages.success(request, "OTP sent successfully")
 
-            print(password_list)
-            random.shuffle(password_list)
-            print(password_list)
+        return redirect("verify_otp")
 
-            password = ""  # we will get final password in this var.
-            for char in password_list:
-                password += char
+    return render(request, "forgotpassword.html")
 
-            ##############################################################
 
-            msg = "hello here it is your new password  " + password  # this variable will be passed as message in mail
+def verify_otp(request):
 
-            ############ code for sending mail ########################
+    email = request.session.get("reset_email")
 
-            from django.core.mail import send_mail
+    if not email:
+        return redirect("forgot_password")
 
-            send_mail(
-                'Your New Password',
-                msg,
-                'modidev747@gmail.com',
-                [username],
-                fail_silently=False,
+    user = registermodel.objects.get(email=email)
+
+    if request.method == "POST":
+
+        otp = request.POST.get("otp")
+
+        if user.reset_otp != otp:
+            messages.error(request, "Invalid OTP")
+            return redirect("verify_otp")
+
+        if timezone.now() > user.otp_created_at + timedelta(minutes=5):
+            messages.error(request, "OTP expired")
+            return redirect("forgot_password")
+
+        request.session["otp_verified"] = True
+
+        return redirect("new_password")
+
+    return render(request, "verifyotp.html")
+
+def new_password(request):
+
+    if not request.session.get("otp_verified"):
+        return redirect("forgot_password")
+
+    email = request.session.get("reset_email")
+
+    user = registermodel.objects.get(email=email)
+
+    if request.method == "POST":
+
+        password = request.POST.get("password")
+        confirm = request.POST.get("confirm")
+
+        if password != confirm:
+            messages.error(request, "Passwords do not match")
+            return redirect("new_password")
+
+        user.password = make_password(password)
+        user.reset_otp = None
+        user.otp_created_at = None
+        user.save()
+
+        request.session.flush()
+
+        messages.success(request, "Password changed successfully")
+
+        return redirect("login")
+
+    return render(request, "resetpassword.html")
+
+# def reset_password(request, uidb64, token):
+
+    try:
+
+        uid = urlsafe_base64_decode(
+            uidb64
+        ).decode()
+
+
+        user = registermodel.objects.get(
+            id=uid
+        )
+
+
+    except:
+
+        user = None
+
+
+
+    if user and default_token_generator.check_token(
+        user,
+        token
+    ):
+
+
+        if request.method == "POST":
+
+            password = request.POST.get(
+                "password"
             )
 
-            # now update the password in model
-            cuser = registermodel.objects.get(email=username)
-            cuser.password = password
-            cuser.confirmpassword = password
-            cuser.save(update_fields=['password'])
 
-            print('Mail sent')
-            messages.info(request, 'mail is sent successfully to your registered email')
-            return redirect(indexpage)
-        else:
-            messages.info(request, 'This account does not exist')
-    return redirect(indexpage)
+            user.password = make_password(
+                password
+            )
+
+
+            user.save()
+
+
+            messages.success(
+                request,
+                "Password changed successfully"
+            )
+
+
+            return redirect("login")
+
+
+
+        return render(
+            request,
+            "resetpassword.html"
+        )
+
+
+
+    messages.error(
+        request,
+        "Invalid link"
+    )
+
+    return redirect(
+        "forgot_password"
+    )
 
 def showreview(request):
     context = base()

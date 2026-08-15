@@ -41,7 +41,7 @@ this is
 ## 💻 How to Run This Project
 
 1. Clone the repository:
-   git clone https://github.com/seju0203/Design-Your-Place.git
+   git clone https://github.com/Modidev168/Design-Your-Place-main.git
 
 2. Navigate to project folder:
    cd Design-Your-Place
@@ -59,9 +59,3 @@ this is
 This project was developed as a final year BCA project to demonstrate practical implementation of Django web development concepts including authentication, database handling, and role-based system design.
 
 ---
-
-## 👩‍💻 Developer
-
-Sejal Yadav  
-Aspiring Python & Django Developer  
-Ahmedabad, India

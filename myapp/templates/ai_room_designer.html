@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Room Designer | Design Your Place</title>
+
+    <style>
+
+        /* =====================================================
+           AI ROOM DESIGNER - PAGE ONLY
+           Scoped so it doesn't affect header/footer
+        ===================================================== */
+
+        .ai-designer-page {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(108, 99, 255, 0.08), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(168, 85, 247, 0.07), transparent 30%),
+                #f6f7fb;
+
+            padding: 55px 20px 80px;
+            color: #1f2937;
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .ai-designer-page .ai-hero {
+            max-width: 1100px;
+            margin: 0 auto 35px;
+            text-align: center;
+        }
+
+        .ai-designer-page .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 15px;
+            margin-bottom: 15px;
+
+            border-radius: 50px;
+
+            background: rgba(99, 102, 241, 0.09);
+            color: #6366f1;
+
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .ai-designer-page .ai-hero h1 {
+            margin: 0 0 12px;
+
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -1.5px;
+
+            color: #111827;
+        }
+
+        .ai-designer-page .ai-hero h1 span {
+            background: linear-gradient(
+                90deg,
+                #6366f1,
+                #8b5cf6,
+                #ec4899
+            );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .ai-designer-page .ai-hero p {
+            max-width: 650px;
+            margin: 0 auto;
+
+            color: #6b7280;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           MAIN CARD
+        ===================================================== */
+
+        .ai-designer-page .designer-card {
+            max-width: 1100px;
+            margin: auto;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 20px 60px rgba(15, 23, 42, 0.08);
+        }
+
+
+        /* =====================================================
+           TWO COLUMN LAYOUT
+        ===================================================== */
+
+        .ai-designer-page .designer-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+
+        /* =====================================================
+           LEFT - IMAGE UPLOAD
+        ===================================================== */
+
+        .ai-designer-page .section-title {
+            margin-bottom: 12px;
+        }
+
+        .ai-designer-page .section-title h2 {
+            margin: 0 0 5px;
+
+            font-size: 18px;
+            font-weight: 650;
+
+            color: #111827;
+        }
+
+        .ai-designer-page .section-title p {
+            margin: 0;
+
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+
+        .ai-designer-page .upload-box {
+            position: relative;
+
+            min-height: 470px;
+
+            border: 2px dashed #d1d5db;
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #fafafa,
+                    #f8f9fc
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition:
+                border-color 0.25s ease,
+                background 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .ai-designer-page .upload-box:hover {
+            border-color: #6366f1;
+
+            background: #f7f7ff;
+
+            transform: translateY(-2px);
+        }
+
+        .ai-designer-page .upload-box.has-image {
+            padding: 12px;
+            border-style: solid;
+            border-color: #e5e7eb;
+            background: #111827;
+        }
+
+        .ai-designer-page .upload-content {
+            padding: 30px;
+        }
+
+        .ai-designer-page .upload-icon {
+            width: 72px;
+            height: 72px;
+
+            margin: 0 auto 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 20px;
+
+            background: #eef2ff;
+            color: #6366f1;
+
+            font-size: 32px;
+        }
+
+        .ai-designer-page .upload-box h3 {
+            margin-bottom: 8px;
+
+            color: #1f2937;
+
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .ai-designer-page .upload-box p {
+            margin-bottom: 8px;
+
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .ai-designer-page .upload-box small {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .ai-designer-page .upload-box input {
+            display: none;
+        }
+
+
+        /* =====================================================
+           IMAGE PREVIEW
+        ===================================================== */
+
+        .ai-designer-page #preview {
+            display: none;
+
+            width: 100%;
+            height: 445px;
+
+            object-fit: cover;
+
+            border-radius: 14px;
+        }
+
+
+        /* =====================================================
+           RIGHT SIDE
+        ===================================================== */
+
+        .ai-designer-page .form-panel {
+            padding: 5px 5px 5px 10px;
+        }
+
+        .ai-designer-page .form-group {
+            margin-bottom: 22px;
+        }
+
+        .ai-designer-page .form-label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #374151;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .ai-designer-page .form-label span {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+
+
+        /* =====================================================
+           SELECTS
+        ===================================================== */
+
+        .ai-designer-page .form-select {
+            width: 100%;
+
+            height: 50px;
+
+            padding: 0 15px;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+
+            background: #ffffff;
+
+            color: #374151;
+
+            font-size: 14px;
+
+            outline: none;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .ai-designer-page .form-select:hover {
+            border-color: #c7d2fe;
+        }
+
+        .ai-designer-page .form-select:focus {
+            border-color: #6366f1;
+
+            box-shadow:
+                0 0 0 4px rgba(99, 102, 241, 0.08);
+        }
+
+
+        /* =====================================================
+           PROMPT
+        ===================================================== */
+
+        .ai-designer-page .prompt-wrapper {
+            position: relative;
+        }
+
+        .ai-designer-page .prompt-input {
+            width: 100%;
+            min-height: 145px;
+
+            padding: 15px;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+
+            background: #ffffff;
+
+            color: #374151;
+
+            font-family: inherit;
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            resize: vertical;
+
+            outline: none;
+
+            transition: 0.2s ease;
+        }
+
+        .ai-designer-page .prompt-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .ai-designer-page .prompt-input:focus {
+            border-color: #6366f1;
+
+            box-shadow:
+                0 0 0 4px rgba(99, 102, 241, 0.08);
+        }
+
+
+        /* =====================================================
+           EXAMPLE PROMPTS
+        ===================================================== */
+
+        .ai-designer-page .prompt-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+
+            margin-top: 10px;
+        }
+
+        .ai-designer-page .prompt-chip {
+            padding: 7px 11px;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 50px;
+
+            background: #f9fafb;
+
+            color: #6b7280;
+
+            font-size: 11px;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .ai-designer-page .prompt-chip:hover {
+            border-color: #c7d2fe;
+            background: #eef2ff;
+            color: #6366f1;
+        }
+
+
+        /* =====================================================
+           GENERATE BUTTON
+        ===================================================== */
+
+        .ai-designer-page .generate-btn {
+            width: 100%;
+
+            height: 55px;
+
+            border: none;
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6366f1,
+                    #8b5cf6
+                );
+
+            color: #ffffff;
+
+            font-size: 15px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 10px 25px rgba(99, 102, 241, 0.25);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .ai-designer-page .generate-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 14px 30px rgba(99, 102, 241, 0.32);
+        }
+
+        .ai-designer-page .generate-btn:active {
+            transform: translateY(0);
+        }
+
+
+        /* =====================================================
+           INFO
+        ===================================================== */
+
+        .ai-designer-page .privacy-note {
+            margin-top: 14px;
+
+            text-align: center;
+
+            color: #9ca3af;
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .ai-designer-page .message {
+            max-width: 1100px;
+            margin: 0 auto 20px;
+
+            padding: 13px 16px;
+
+            border-radius: 12px;
+
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+
+            color: #047857;
+
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 850px) {
+
+            .ai-designer-page {
+                padding: 35px 15px 60px;
+            }
+
+            .ai-designer-page .designer-card {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .ai-designer-page .designer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-designer-page .form-panel {
+                padding: 5px 0;
+            }
+
+            .ai-designer-page .upload-box {
+                min-height: 350px;
+            }
+
+            .ai-designer-page #preview {
+                height: 330px;
+            }
+        }
+
+
+        @media (max-width: 500px) {
+
+            .ai-designer-page .ai-hero h1 {
+                font-size: 32px;
+            }
+
+            .ai-designer-page .designer-card {
+                padding: 15px;
+            }
+
+            .ai-designer-page .upload-box {
+                min-height: 300px;
+            }
+
+            .ai-designer-page #preview {
+                height: 280px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+{% include 'header.html' %}
+
+
+<main class="ai-designer-page">
+
+
+    <!-- HERO -->
+
+    <div class="ai-hero">
+
+        <div class="ai-badge">
+            ✨ AI POWERED INTERIOR DESIGN
+        </div>
+
+        <h1>
+            Design Your <span>Dream Room</span>
+        </h1>
+
+        <p>
+            Upload a photo of your room, describe your vision,
+            and let AI transform your space into something beautiful.
+        </p>
+
+    </div>
+
+
+    <!-- MESSAGES -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- MAIN CARD -->
+
+    <div class="designer-card">
+
+        <form method="POST"
+              enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+
+            <div class="designer-grid">
+
+
+                <!-- =========================================
+                     LEFT SIDE - IMAGE
+                ========================================== -->
+
+                <div>
+
+                    <div class="section-title">
+
+                        <h2>
+                            Your Room
+                        </h2>
+
+                        <p>
+                            Upload a clear photo of your space
+                        </p>
+
+                    </div>
+
+
+                    <label
+                        class="upload-box"
+                        id="uploadBox"
+                        for="room_image">
+
+
+                        <div
+                            class="upload-content"
+                            id="uploadContent">
+
+                            <div class="upload-icon">
+                                📷
+                            </div>
+
+                            <h3>
+                                Upload your room photo
+                            </h3>
+
+                            <p>
+                                Click to browse or choose an image
+                            </p>
+
+                            <small>
+                                JPG, JPEG or PNG • Recommended high quality image
+                            </small>
+
+                        </div>
+
+
+                        <img
+                            id="preview"
+                            alt="Room preview"
+                        >
+
+
+                        <input
+                            type="file"
+                            name="room_image"
+                            id="room_image"
+                            accept="image/jpeg,image/png,image/jpg"
+                            required
+                        >
+
+                    </label>
+
+                </div>
+
+
+
+                <!-- =========================================
+                     RIGHT SIDE - OPTIONS
+                ========================================== -->
+
+                <div class="form-panel">
+
+
+                    <!-- ROOM TYPE -->
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Room Type
+                            <span>— What are you designing?</span>
+                        </label>
+
+                        <select
+                            name="room_type"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                Select room type
+                            </option>
+
+                            <option value="Living Room">
+                                🛋️ Living Room
+                            </option>
+
+                            <option value="Bedroom">
+                                🛏️ Bedroom
+                            </option>
+
+                            <option value="Kitchen">
+                                🍳 Kitchen
+                            </option>
+
+                            <option value="Study Room">
+                                📚 Study Room
+                            </option>
+
+                            <option value="Office">
+                                💼 Office
+                            </option>
+
+                            <option value="Dining Room">
+                                🍽️ Dining Room
+                            </option>
+
+                        </select>
+
+                    </div>
+                    <div class="form-group">
+
+                        <label class="form-label">Color Theme</label>
+
+                        <select class="form-select" name="color_theme" required>
+                            <option value="">
+                                Select color theme
+                            </option>
+                            <option value="Neutral">
+                                Neutral
+                            </option>
+
+                            <option value="Warm">
+                                Warm
+                            </option>
+
+                            <option value="Cool">
+                                Cool
+                            </option>
+
+                            <option value="White">
+                                White
+                            </option>
+
+                            <option value="Earthy">
+                                Earthy
+                            </option>
+
+                            <option value="Dark">
+                                Dark
+                            </option>
+
+                        </select>
+
+                    </div>
+                    <div class="form-group">
+
+                        <label class="form-label">Lighting</label>
+
+                        <select class="form-select" name="lighting" required>
+                            <option value="">
+                                Select lighting
+                            </option>
+                            <option value="Natural">
+                                Natural
+                            </option>
+
+                            <option value="Warm">
+                                Warm
+                            </option>
+
+                            <option value="Bright">
+                                Bright
+                            </option>
+
+                            <option value="Ambient">
+                                Ambient
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- DESIGN STYLE -->
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Design Style
+                            <span>— Choose your aesthetic</span>
+                        </label>
+
+                        <select
+                            name="design_style"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                Select design style
+                            </option>
+
+                            <option value="Modern">
+                                Modern
+                            </option>
+
+                            <option value="Minimalist">
+                                Minimalist
+                            </option>
+
+                            <option value="Luxury">
+                                Luxury
+                            </option>
+
+                            <option value="Scandinavian">
+                                Scandinavian
+                            </option>
+
+                            <option value="Industrial">
+                                Industrial
+                            </option>
+
+                            <option value="Traditional">
+                                Traditional
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">Budget</label>
+
+                        <select class="form-select" name="budget" required>
+                            <option value="">
+                                Select budget
+                            </option>
+                            <option value="Low">
+                                Low
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="Premium">
+                                Premium
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- PROMPT -->
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Describe Your Design
+                            <span>— Tell AI what you want</span>
+                        </label>
+
+
+                        <div class="prompt-wrapper">
+
+                            <textarea
+                                name="prompt"
+                                id="prompt"
+                                class="prompt-input"
+                                placeholder="Example: Create a warm modern living room with wooden furniture, soft lighting, indoor plants and neutral colors..."
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- EXAMPLES -->
+
+                        <div class="prompt-examples">
+
+                            <button
+                                type="button"
+                                class="prompt-chip"
+                                onclick="setPrompt('Create a modern room with wooden furniture and warm lighting.')">
+
+                                Modern & Warm
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="prompt-chip"
+                                onclick="setPrompt('Create a minimalist room with neutral colors and simple furniture.')">
+
+                                Minimalist
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="prompt-chip"
+                                onclick="setPrompt('Create a luxury interior with elegant furniture, premium lighting and beautiful decorations.')">
+
+                                Luxury
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="prompt-chip"
+                                onclick="setPrompt('Add indoor plants, natural materials and lots of natural light.')">
+
+                                Natural
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- GENERATE -->
+
+                    <button
+                        type="submit"
+                        class="generate-btn">
+
+                        ✨ Generate My Room Design
+
+                    </button>
+
+
+                    <div class="privacy-note">
+
+                        🔒 Your uploaded image is used only for your design request.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    const imageInput =
+        document.getElementById("room_image");
+
+    const preview =
+        document.getElementById("preview");
+
+    const uploadBox =
+        document.getElementById("uploadBox");
+
+    const uploadContent =
+        document.getElementById("uploadContent");
+
+
+    /*
+    =========================================
+    IMAGE PREVIEW
+    =========================================
+    */
+
+    imageInput.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+
+        if (!file.type.startsWith("image/")) {
+
+            alert("Please select a valid image.");
+
+            this.value = "";
+
+            return;
+        }
+
+
+        const imageURL =
+            URL.createObjectURL(file);
+
+
+        preview.src =
+            imageURL;
+
+
+        preview.style.display =
+            "block";
+
+
+        uploadContent.style.display =
+            "none";
+
+
+        uploadBox.classList.add(
+            "has-image"
+        );
+
+    });
+
+
+    /*
+    =========================================
+    PROMPT EXAMPLE BUTTONS
+    =========================================
+    */
+
+    function setPrompt(text) {
+
+        document.getElementById("prompt").value =
+            text;
+
+    }
+
+</script>
+
+
+{% include 'footer.html' %}
+
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>My AI Room Designs</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(280px, 1fr));
+
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .content h3 {
+            margin-top: 0;
+        }
+
+        .style {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #111;
+            color: white;
+            text-decoration: none;
+            border-radius: 7px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #666;
+            padding: 50px;
+        }
+        .delete-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 15px;
+
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+
+    background: #fef2f2;
+    color: #dc2626;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+}
+
+    </style>
+
+</head>
+
+
+<body>
+<div class="container">
+
+<h1>🎨 My AI Room Designs</h1>
+
+{% if designs %}
+
+    <div class="grid">
+
+        {% for design in designs %}
+
+            <div class="card">
+
+                {% if design.generated_image %}
+
+                    <img
+                        src="{{ design.generated_image.url }}"
+                        alt="AI Room Design"
+                    >
+
+                {% elif design.original_image %}
+
+                    <img
+                        src="{{ design.original_image.url }}"
+                        alt="Room"
+                    >
+
+                {% endif %}
+
+                <div class="content">
+
+                    <h3>
+                        {{ design.room_type }}
+                    </h3>
+
+                    <div class="style">
+                        {{ design.design_style }}
+                    </div>
+
+                    <p>
+                        Status:
+                        <strong>
+                            {{ design.status }}
+                        </strong>
+                    </p>
+
+                    <!-- View Design -->
+
+                    <a
+                        href="{% url 'ai_room_result' design.id %}"
+                        class="btn"
+                    >
+                        View Design →
+                    </a>
+
+                    <!-- Delete Design -->
+
+                    <form
+                        method="POST"
+                        action="{% url 'delete_ai_design' design.id %}"
+                        onsubmit="return confirm('Are you sure you want to delete this design?');"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="delete-btn"
+                        >
+                            🗑 Delete Design
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% else %}
+
+    <div class="empty">
+
+        <h2>No designs yet</h2>
+
+        <p>
+            Create your first AI room design.
+        </p>
+
+        <a
+            href="{% url 'ai_room_designer' %}"
+            class="btn"
+        >
+            Create Design
+        </a>
+
+    </div>
+
+{% endif %}
+```
+
+</div>
+
+
+</body>
+
+</html>

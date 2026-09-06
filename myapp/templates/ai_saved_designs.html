@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Saved AI Designs | Design Your Place</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f6f7fb;
+            color: #1f2937;
+        }
+
+        /* =========================================
+           PAGE
+        ========================================= */
+
+        .saved-page {
+            min-height: 100vh;
+            padding: 55px 20px 80px;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(108, 99, 255, 0.08),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 20%,
+                    rgba(168, 85, 247, 0.07),
+                    transparent 30%
+                ),
+                #f6f7fb;
+        }
+
+
+        /* =========================================
+           HEADER
+        ========================================= */
+
+        .saved-header {
+            max-width: 1100px;
+            margin: 0 auto 35px;
+            text-align: center;
+        }
+
+        .saved-badge {
+            display: inline-flex;
+            align-items: center;
+
+            padding: 8px 15px;
+            margin-bottom: 15px;
+
+            border-radius: 50px;
+
+            background: rgba(99, 102, 241, 0.09);
+
+            color: #6366f1;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .saved-header h1 {
+            margin: 0 0 12px;
+
+            font-size: clamp(32px, 5vw, 46px);
+
+            color: #111827;
+
+            letter-spacing: -1px;
+        }
+
+        .saved-header h1 span {
+            background: linear-gradient(
+                90deg,
+                #6366f1,
+                #8b5cf6,
+                #ec4899
+            );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            color: transparent;
+        }
+
+        .saved-header p {
+            max-width: 650px;
+            margin: auto;
+
+            color: #6b7280;
+
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+
+        /* =========================================
+           CONTAINER
+        ========================================= */
+
+        .saved-container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+
+        /* =========================================
+           MESSAGES
+        ========================================= */
+
+        .message {
+            margin-bottom: 25px;
+
+            padding: 13px 16px;
+
+            border-radius: 12px;
+
+            background: #ecfdf5;
+
+            border: 1px solid #a7f3d0;
+
+            color: #047857;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================================
+           GRID
+        ========================================= */
+
+        .design-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 25px;
+        }
+
+
+        /* =========================================
+           DESIGN CARD
+        ========================================= */
+
+        .design-card {
+
+            overflow: hidden;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 10px 35px rgba(15, 23, 42, 0.07);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .design-card:hover {
+
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 18px 45px rgba(15, 23, 42, 0.12);
+        }
+
+
+        /* =========================================
+           IMAGE
+        ========================================= */
+
+        .image-wrapper {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 230px;
+
+            background: #111827;
+
+            overflow: hidden;
+        }
+
+        .image-wrapper img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+        }
+
+
+        /* =========================================
+           SAVED BADGE
+        ========================================= */
+
+        .saved-label {
+
+            position: absolute;
+
+            top: 12px;
+            right: 12px;
+
+            padding: 6px 10px;
+
+            border-radius: 50px;
+
+            background: rgba(255, 255, 255, 0.95);
+
+            color: #6366f1;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+
+        /* =========================================
+           CARD CONTENT
+        ========================================= */
+
+        .card-content {
+
+            padding: 18px;
+        }
+
+        .card-content h2 {
+
+            margin: 0 0 10px;
+
+            color: #111827;
+
+            font-size: 18px;
+        }
+
+
+        /* =========================================
+           DETAILS
+        ========================================= */
+
+        .details {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            margin-bottom: 15px;
+        }
+
+        .detail {
+
+            padding: 6px 9px;
+
+            border-radius: 7px;
+
+            background: #f3f4f6;
+
+            color: #6b7280;
+
+            font-size: 11px;
+        }
+
+
+        /* =========================================
+           PROMPT
+        ========================================= */
+
+        .prompt {
+
+            margin-bottom: 18px;
+
+            color: #6b7280;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            display: -webkit-box;
+
+            -webkit-line-clamp: 3;
+
+            -webkit-box-orient: vertical;
+
+            overflow: hidden;
+        }
+
+
+        /* =========================================
+           BUTTONS
+        ========================================= */
+
+        .actions {
+
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+        .btn {
+
+            flex: 1;
+
+            min-width: 100px;
+
+            padding: 10px 12px;
+
+            border-radius: 9px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        /* VIEW */
+
+        .view-btn {
+
+            background: #eef2ff;
+
+            color: #6366f1;
+        }
+
+        .view-btn:hover {
+
+            background: #e0e7ff;
+        }
+
+
+        /* EDIT */
+
+        .edit-btn {
+
+            background: #f5f3ff;
+
+            color: #7c3aed;
+        }
+
+        .edit-btn:hover {
+
+            background: #ede9fe;
+        }
+
+
+        /* REMOVE */
+
+        .remove-btn {
+
+            border: none;
+
+            background: #fef2f2;
+
+            color: #dc2626;
+        }
+
+        .remove-btn:hover {
+
+            background: #fee2e2;
+        }
+
+
+        /* =========================================
+           EMPTY STATE
+        ========================================= */
+
+        .empty-state {
+
+            max-width: 600px;
+
+            margin: 30px auto;
+
+            padding: 60px 30px;
+
+            text-align: center;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 10px 35px rgba(15, 23, 42, 0.06);
+        }
+
+        .empty-icon {
+
+            width: 75px;
+            height: 75px;
+
+            margin: 0 auto 20px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 20px;
+
+            background: #eef2ff;
+
+            font-size: 32px;
+        }
+
+        .empty-state h2 {
+
+            margin: 0 0 10px;
+
+            color: #111827;
+        }
+
+        .empty-state p {
+
+            margin: 0 0 25px;
+
+            color: #6b7280;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+        .create-btn {
+
+            display: inline-block;
+
+            padding: 12px 20px;
+
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6366f1,
+                    #8b5cf6
+                );
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 900px) {
+
+            .design-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .saved-page {
+
+                padding: 35px 15px 60px;
+            }
+
+            .design-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .image-wrapper {
+
+                height: 250px;
+            }
+
+            .actions {
+
+                flex-direction: column;
+            }
+
+            .btn {
+
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+{% include 'header.html' %}
+
+
+<main class="saved-page">
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <div class="saved-header">
+
+        <div class="saved-badge">
+            ⭐ YOUR SAVED DESIGNS
+        </div>
+
+        <h1>
+            My <span>Saved Designs</span>
+        </h1>
+
+        <p>
+            Keep your favorite AI-generated room designs
+            in one place and easily view or edit them anytime.
+        </p>
+
+    </div>
+
+
+    <div class="saved-container">
+
+
+        <!-- =========================================
+             MESSAGES
+        ========================================== -->
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <!-- =========================================
+             DESIGNS
+        ========================================== -->
+
+        {% if designs %}
+
+
+            <div class="design-grid">
+
+
+                {% for design in designs %}
+
+
+                    <div class="design-card">
+
+
+                        <!-- IMAGE -->
+
+                        <div class="image-wrapper">
+
+                            {% if design.generated_image %}
+
+                                <img
+                                    src="{{ design.generated_image.url }}"
+                                    alt="AI Generated Room"
+                                >
+
+                            {% elif design.original_image %}
+
+                                <img
+                                    src="{{ design.original_image.url }}"
+                                    alt="Room"
+                                >
+
+                            {% endif %}
+
+
+                            <div class="saved-label">
+
+                                ⭐ Saved
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CONTENT -->
+
+                        <div class="card-content">
+
+
+                            <h2>
+
+                                {{ design.room_type }}
+
+                            </h2>
+
+
+                            <!-- DETAILS -->
+
+                            <div class="details">
+
+                                <span class="detail">
+
+                                    🎨 {{ design.design_style }}
+
+                                </span>
+
+
+                                {% if design.color_theme %}
+
+                                    <span class="detail">
+
+                                        🎨 {{ design.color_theme }}
+
+                                    </span>
+
+                                {% endif %}
+
+
+                                {% if design.lighting %}
+
+                                    <span class="detail">
+
+                                        💡 {{ design.lighting }}
+
+                                    </span>
+
+                                {% endif %}
+
+
+                                {% if design.budget %}
+
+                                    <span class="detail">
+
+                                        💰 {{ design.budget }}
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- PROMPT -->
+
+                            {% if design.prompt %}
+
+                                <div class="prompt">
+
+                                    {{ design.prompt }}
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="actions">
+
+
+                                <!-- VIEW -->
+
+                                <a
+                                    href="{% url 'ai_room_result' design_id=design.id %}"
+                                    class="btn view-btn"
+                                >
+
+                                    👁 View
+
+                                </a>
+
+
+                                <!-- EDIT -->
+
+                                <a
+                                    href="{% url 'ai_room_edit' design_id=design.id %}"
+                                    class="btn edit-btn"
+                                >
+
+                                    ✏️ Edit
+
+                                </a>
+
+
+                                <!-- REMOVE -->
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'save_ai_design' design_id=design.id %}"
+                                    style="flex: 1; margin: 0;"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn remove-btn"
+                                        style="width: 100%;"
+                                    >
+
+                                        ♡ Remove
+
+                                    </button>
+
+                                </form>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =========================================
+                 EMPTY STATE
+            ========================================== -->
+
+            <div class="empty-state">
+
+
+                <div class="empty-icon">
+
+                    ⭐
+
+                </div>
+
+
+                <h2>
+                    No Saved Designs Yet
+                </h2>
+
+
+                <p>
+
+                    You haven't saved any AI room designs yet.
+                    Generate a room design and click
+                    <strong>Save Design</strong> to keep it here.
+
+                </p>
+
+
+                <a
+                    href="{% url 'ai_room_designer' %}"
+                    class="create-btn"
+                >
+
+                    ✨ Create New Design
+
+                </a>
+
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</main>
+
+
+{% include 'footer.html' %}
+
+
+</body>
+
+</html>

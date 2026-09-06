@@ -154,3 +154,67 @@ class Payment(models.Model):
     razorpay_signature = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=20, default="Pending")
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class AIRoomDesign(models.Model):
+    ROOM_TYPES = [
+        ("Living Room", "Living Room"),
+        ("Bedroom", "Bedroom"),
+        ("Kitchen", "Kitchen"),
+        ("Study Room", "Study Room"),
+        ("Bathroom", "Bathroom"),
+        ("Office", "Office"),
+    ]
+    DESIGN_STYLES = [
+        ("Modern", "Modern"),
+        ("Minimalist", "Minimalist"),
+        ("Luxury", "Luxury"),
+        ("Scandinavian", "Scandinavian"),
+        ("Industrial", "Industrial"),
+        ("Traditional", "Traditional"),
+    ]
+    STATUS_CHOICES = [
+        ("pending","Pending"),
+        ("processing","Processing"),
+        ("completed","Completed"),
+        ("failed","Failed"),
+    ]
+    COLOR_THEMES = [
+    ("Neutral", "Neutral"),
+    ("Warm", "Warm"),
+    ("Cool", "Cool"),
+    ("White", "White"),
+    ("Earthy", "Earthy"),
+    ("Dark", "Dark"),
+    ]
+
+    LIGHTING_CHOICES = [
+        ("Natural", "Natural"),
+        ("Warm", "Warm"),
+        ("Bright", "Bright"),
+        ("Ambient", "Ambient"),
+    ]
+
+    BUDGET_CHOICES = [
+        ("Budget", "Budget"),
+        ("Medium", "Medium"),
+        ("Premium", "Premium"),
+    ]
+    client = models.ForeignKey('registermodel', related_name='ai_room_designs', on_delete=models.CASCADE)
+    original_image = models.ImageField(upload_to="ai_rooms/original/")
+    room_type = models.CharField(max_length=30,choices=ROOM_TYPES)
+    design_style = models.CharField(max_length=30,choices=DESIGN_STYLES)
+    prompt = models.TextField()
+    generated_image = models.ImageField(upload_to="ai_rooms/generated/",blank=True, null=True)
+    status = models.CharField(max_length=30,default="pending",choices=STATUS_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    color_theme = models.CharField(max_length=30,choices=COLOR_THEMES,default="Neutral")
+    lighting = models.CharField(max_length=30,choices=LIGHTING_CHOICES,default="Natural")
+    is_saved = models.BooleanField(default=False)
+    budget = models.CharField(max_length=30,choices=BUDGET_CHOICES,default="Medium")
+    parent_design = models.ForeignKey("self",on_delete=models.CASCADE,null=True,blank=True,related_name="versions")
+    version = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.client.fullname} - {self.room_type} - {self.design_style}"
+

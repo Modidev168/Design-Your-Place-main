@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Design Versions</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f6f7fb;
+            color: #1f2937;
+        }
+
+        .versions-page {
+            min-height: 100vh;
+            padding: 50px 20px 80px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .version-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 25px;
+        }
+
+        .version-card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 10px 30px rgba(
+                    15,
+                    23,
+                    42,
+                    0.07
+                );
+        }
+
+        .version-image {
+            width: 100%;
+            height: 240px;
+
+            object-fit: cover;
+
+            display: block;
+
+            background: #111827;
+        }
+
+        .version-content {
+            padding: 20px;
+        }
+
+        .version-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 15px;
+        }
+
+        .version-title h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .badge {
+            padding: 6px 10px;
+
+            border-radius: 50px;
+
+            background: #eef2ff;
+
+            color: #6366f1;
+
+            font-size: 11px;
+
+            font-weight: 600;
+        }
+
+        .prompt {
+            color: #6b7280;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            margin-bottom: 18px;
+        }
+
+        .status {
+            display: inline-block;
+
+            padding: 6px 10px;
+
+            border-radius: 50px;
+
+            background: #ecfdf5;
+
+            color: #047857;
+
+            font-size: 11px;
+
+            margin-bottom: 15px;
+        }
+
+        .buttons {
+            display: flex;
+
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+
+            padding: 10px;
+
+            border-radius: 9px;
+
+            text-decoration: none;
+
+            text-align: center;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+        .view-btn {
+            background: #eef2ff;
+            color: #6366f1;
+        }
+
+        .edit-btn {
+            background: #f5f3ff;
+            color: #7c3aed;
+        }
+
+        @media(max-width: 900px) {
+
+            .version-grid {
+                grid-template-columns: repeat(
+                    2,
+                    1fr
+                );
+            }
+        }
+
+        @media(max-width: 600px) {
+
+            .version-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .versions-page {
+                padding: 35px 15px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+{% include 'header.html' %}
+
+<main class="versions-page">
+
+    <div class="container">
+
+        <div class="header">
+
+            <h1>
+                🎨 Design Versions
+            </h1>
+
+            <p>
+                View all versions of your AI room design.
+            </p>
+
+        </div>
+
+
+        <div class="version-grid">
+
+            {% for version in versions %}
+
+                <div class="version-card">
+
+                    {% if version.generated_image %}
+
+                        <img
+                            src="{{ version.generated_image.url }}"
+                            class="version-image"
+                            alt="Room Design"
+                        >
+
+                    {% else %}
+
+                        <img
+                            src="{{ version.original_image.url }}"
+                            class="version-image"
+                            alt="Room"
+                        >
+
+                    {% endif %}
+
+
+                    <div class="version-content">
+
+                        <div class="version-title">
+
+                            <h2>
+                                Version {{ version.version }}
+                            </h2>
+
+                            <span class="badge">
+                                v{{ version.version }}
+                            </span>
+
+                        </div>
+
+
+                        <span class="status">
+
+                            {{ version.status }}
+
+                        </span>
+
+
+                        <div class="prompt">
+
+                            {{ version.prompt }}
+
+                        </div>
+
+
+                        <div class="buttons">
+
+                            <a
+                                href="{% url 'ai_room_result' design_id=version.id %}"
+                                class="btn view-btn"
+                            >
+                                👁 View
+                            </a>
+
+
+                            <a
+                                href="{% url 'ai_room_edit' design_id=version.id %}"
+                                class="btn edit-btn"
+                            >
+                                ✏️ Edit
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <p>
+                    No design versions found.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</main>
+
+{% include 'footer.html' %}
+
+</body>
+
+</html>

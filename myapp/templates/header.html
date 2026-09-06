@@ -288,17 +288,23 @@ RIGHT SIDEBAR TOGGLE SECTION
                             <a class="dropdown-item" href="/Review">Review</a>
                         </div>
                     </li>
+                    
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact Us</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ai_room_designer' %}">✨ AI Room Designer</a>
+                    </li><li class="nav-item">
+                        <a href="{% url 'ai_room_history' %}">
+                                🖼️ Design History
+                            </a>
 
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="/contact">Contact Us</a>
-                        </li>
-                        {% endif %}
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="/logout">LogOut</a>
-                        </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">LogOut</a>
+                    </li>
                         <li class="nav-item">
                             <img src="../../static/images/User.png"  height="30px" width="50px" alt="User">
                             <span class="nav-link">{{ request.session.log_name }}</span>

@@ -16,9 +16,12 @@ from django.utils import timezone
 from datetime import timedelta
 import random
 import base64
+from django.db.models import Max
 from django.core.files.base import ContentFile
 from .ai_service import generate_room_design
 from django.db.models import Q
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 
 def base():
     packages = Packagecategory.objects.all()
@@ -94,7 +97,20 @@ def checklogindata(request):
         request.session["log_email"] = userdata.email
         request.session["log_role"] = userdata.Role
 
+        django_user, created = User.objects.get_or_create(
+            username=userdata.email,
+            defaults={
+                "email": userdata.email,
+                "first_name": userdata.fullname,
+            }
+        )
+
+        login(request, django_user)
+
         print("Login Successful")
+        print("REGISTERMODEL ID:", userdata.id)
+        print("DJANGO USER ID:", django_user.id)
+        print("DJANGO USERNAME:", django_user.username)
 
         return redirect("showportfolio")
 
@@ -1075,21 +1091,47 @@ def ai_room_designer(request):
         "ai_room_designer.html"
     )
 
+# def ai_room_result(request, design_id):
+
+#     if 'log_id' not in request.session:
+#         return redirect("login")
+#     print("========== RESULT DEBUG ==========")
+#     print("Requested design:", design_id)
+#     print("Session log_id:", request.session["log_id"])
+#     design = AIRoomDesign.objects.get(
+#         id=design_id,
+#         client_id=request.session["log_id"]
+#     )
+
+#     return render(
+#         request,
+#         "ai_room_result.html",
+#         {
+#             "design": design
+#         }
+#     )
+
 def ai_room_result(request, design_id):
 
     if 'log_id' not in request.session:
         return redirect("login")
+
+    print("RESULT DESIGN ID:", design_id)
+    print("SESSION LOG ID:", request.session.get("log_id"))
 
     design = AIRoomDesign.objects.get(
         id=design_id,
         client_id=request.session["log_id"]
     )
 
+    versions = design.design_versions.all()
+
     return render(
         request,
         "ai_room_result.html",
         {
-            "design": design
+            "design": design,
+            "versions": versions,
         }
     )
 
@@ -1097,6 +1139,8 @@ def ai_room_history(request):
 
     if 'log_id' not in request.session:
         return redirect("login")
+    
+    print("HISTORY LOG ID:", request.session["log_id"])
 
     designs = AIRoomDesign.objects.filter(
         client_id=request.session["log_id"]
@@ -1408,461 +1452,6 @@ def ai_room_versions(request, design_id):
         }
     )
 
-def ai_room_designer(request):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    if request.method == "POST":
-
-        room_image = request.FILES.get("room_image")
-        room_type = request.POST.get("room_type")
-        design_style = request.POST.get("design_style")
-        prompt = request.POST.get("prompt")
-        color_theme = request.POST.get("color_theme")
-        lighting = request.POST.get("lighting")
-        budget = request.POST.get("budget")
-
-        print("========== AI ROOM DESIGN ==========")
-        print("Image:", room_image)
-        print("Room Type:", room_type)
-        print("Design Style:", design_style)
-        print("Prompt:", prompt)
-        print("User ID:", request.session["log_id"])
-        print("====================================")
-
-        if not room_image:
-
-            messages.error(
-                request,
-                "Please upload an image of your room."
-            )
-
-            return redirect("ai_room_designer")
-
-        design = None
-
-        try:
-
-            client = registermodel.objects.get(
-                id=request.session["log_id"]
-            )
-
-            # Create database record
-            design = AIRoomDesign.objects.create(
-                client=client,
-                original_image=room_image,
-                room_type=room_type,
-                design_style=design_style,
-                color_theme=color_theme,
-                lighting=lighting,
-                budget=budget,
-                prompt=prompt,
-                status="processing",
-                version=1,
-                parent_design=None,
-            )
-
-            print("Design saved successfully!")
-            print("Design ID:", design.id)
-
-            # Generate image
-            generated_image = generate_room_design(design)
-
-            # Convert base64 → bytes
-            image_bytes = base64.b64decode(
-                generated_image
-            )
-
-            # Save generated image
-            design.generated_image.save(
-                f"room_design_{design.id}.png",
-                ContentFile(image_bytes),
-                save=False
-            )
-
-            design.status = "completed"
-
-            design.save()
-
-            print("====================================")
-            print("AI DESIGN COMPLETED")
-            print("Design ID:", design.id)
-            print(
-                "Generated:",
-                design.generated_image.name
-            )
-            print("====================================")
-
-            messages.success(
-                request,
-                "Your room design has been generated successfully!"
-            )
-
-            return redirect(
-                "ai_room_result",
-                design_id=design.id
-            )
-
-        except Exception as e:
-
-            print("====================================")
-            print("AI GENERATION ERROR")
-            print(e)
-            print("====================================")
-
-            if design:
-
-                design.status = "failed"
-
-                design.save(
-                    update_fields=["status"]
-                )
-
-            messages.error(
-                request,
-                "AI generation failed. Please try again."
-            )
-
-            return redirect("ai_room_designer")
-
-    return render(
-        request,
-        "ai_room_designer.html"
-    )
-
-def ai_room_result(request, design_id):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    design = AIRoomDesign.objects.get(
-        id=design_id,
-        client_id=request.session["log_id"]
-    )
-
-    return render(
-        request,
-        "ai_room_result.html",
-        {
-            "design": design
-        }
-    )
-
-def ai_room_history(request):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    designs = AIRoomDesign.objects.filter(
-        client_id=request.session["log_id"]
-    ).order_by("-created_at")
-
-    return render(
-        request,
-        "ai_room_history.html",
-        {
-            "designs": designs
-        }
-    )
-
-def ai_room_edit(request, design_id):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    # ==========================================
-    # GET CURRENT DESIGN
-    # ==========================================
-
-    old_design = get_object_or_404(
-        AIRoomDesign,
-        id=design_id,
-        client_id=request.session["log_id"]
-    )
-
-    # ==========================================
-    # POST
-    # ==========================================
-
-    if request.method == "POST":
-
-        edit_prompt = request.POST.get(
-            "edit_prompt",
-            ""
-        ).strip()
-
-        if not edit_prompt:
-
-            messages.error(
-                request,
-                "Please enter what you want to change."
-            )
-
-            return redirect(
-                "ai_room_edit",
-                design_id=design_id
-            )
-
-        # ==========================================
-        # FIND ROOT DESIGN
-        # ==========================================
-
-        root_design = old_design
-
-        while root_design.parent_design:
-
-            root_design = root_design.parent_design
-
-        # ==========================================
-        # FIND NEXT VERSION
-        # ==========================================
-
-        last_version = AIRoomDesign.objects.filter(
-            parent_design=root_design
-        ).order_by("-version").first()
-
-        if last_version:
-
-            next_version = last_version.version + 1
-
-        else:
-
-            next_version = old_design.version + 1
-
-        # ==========================================
-        # CREATE NEW VERSION
-        # ==========================================
-
-        new_design = AIRoomDesign.objects.create(
-
-            client=old_design.client,
-
-            # Keep original room image
-            original_image=old_design.original_image,
-
-            room_type=old_design.room_type,
-
-            design_style=old_design.design_style,
-
-            color_theme=old_design.color_theme,
-
-            lighting=old_design.lighting,
-
-            budget=old_design.budget,
-
-            prompt=edit_prompt,
-
-            status="processing",
-
-            # ======================================
-            # VERSIONING
-            # ======================================
-
-            parent_design=root_design,
-
-            version=next_version
-        )
-
-        print("====================================")
-        print("AI VERSION GENERATION")
-        print("Root Design:", root_design.id)
-        print("Old Design:", old_design.id)
-        print("New Design:", new_design.id)
-        print("Version:", next_version)
-        print("Edit Prompt:", edit_prompt)
-        print("====================================")
-
-        try:
-
-            # ==========================================
-            # GENERATE IMAGE
-            # ==========================================
-
-            generated_image = generate_room_design(
-                new_design
-            )
-
-            print(
-                "AI image generated successfully"
-            )
-
-            # ==========================================
-            # BASE64 → BYTES
-            # ==========================================
-
-            image_bytes = base64.b64decode(
-                generated_image
-            )
-
-            # ==========================================
-            # SAVE IMAGE
-            # ==========================================
-
-            new_design.generated_image.save(
-
-                f"room_design_{new_design.id}.png",
-
-                ContentFile(image_bytes),
-
-                save=False
-            )
-
-            # ==========================================
-            # COMPLETE
-            # ==========================================
-
-            new_design.status = "completed"
-
-            new_design.save()
-
-            print("====================================")
-            print("AI VERSION COMPLETED")
-            print("Design ID:", new_design.id)
-            print("Version:", new_design.version)
-            print(
-                "Generated:",
-                new_design.generated_image.name
-            )
-            print("====================================")
-
-            messages.success(
-                request,
-                f"Design version {new_design.version} created successfully!"
-            )
-
-            return redirect(
-                "ai_room_result",
-                design_id=new_design.id
-            )
-
-        except Exception as e:
-
-            print("====================================")
-            print("AI VERSION ERROR")
-            print(e)
-            print("====================================")
-
-            new_design.status = "failed"
-
-            new_design.save(
-                update_fields=["status"]
-            )
-
-            messages.error(
-                request,
-                "AI generation failed. Please try again."
-            )
-
-            return redirect(
-                "ai_room_result",
-                design_id=new_design.id
-            )
-
-    # ==========================================
-    # GET EDIT PAGE
-    # ==========================================
-
-    return render(
-        request,
-        "ai_room_edit.html",
-        {
-            "design": old_design
-        }
-    )
-
-def save_ai_design(request, design_id):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    design = get_object_or_404(
-        AIRoomDesign,
-        id=design_id,
-        client_id=request.session["log_id"]
-    )
-
-    design.is_saved = not design.is_saved
-
-    design.save(
-        update_fields=["is_saved"]
-    )
-
-    if design.is_saved:
-
-        messages.success(
-            request,
-            "Design saved successfully!"
-        )
-
-    else:
-
-        messages.success(
-            request,
-            "Design removed from saved designs."
-        )
-
-    return redirect(
-        "ai_room_result",
-        design_id=design.id
-    )
-
-def ai_saved_designs(request):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    designs = AIRoomDesign.objects.filter(
-        client_id=request.session["log_id"],
-        is_saved=True
-    ).order_by("-created_at")
-
-    return render(
-        request,
-        "ai_saved_designs.html",
-        {
-            "designs": designs
-        }
-    )
-
-def ai_room_versions(request, design_id):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    design = get_object_or_404(
-        AIRoomDesign,
-        id=design_id,
-        client_id=request.session["log_id"]
-    )
-
-    # ==========================================
-    # FIND ROOT DESIGN
-    # ==========================================
-
-    root_design = design
-
-    while root_design.parent_design:
-
-        root_design = root_design.parent_design
-
-    # ==========================================
-    # GET ALL VERSIONS
-    # ==========================================
-
-    versions = AIRoomDesign.objects.filter(
-        Q(id=root_design.id) |
-        Q(parent_design=root_design)
-    ).order_by("version")
-
-    return render(
-        request,
-        "ai_room_versions.html",
-        {
-            "design": root_design,
-            "versions": versions
-        }
-    )
 def delete_ai_design(request, design_id):
 
     if 'log_id' not in request.session:
@@ -1887,4 +1476,78 @@ def delete_ai_design(request, design_id):
 
     return redirect(
         "ai_room_history"
+    )
+
+def restore_design_version(request, design_id, version_id):
+
+    if "log_id" not in request.session:
+        return redirect("login")
+
+    design = get_object_or_404(
+        AIRoomDesign,
+        id=design_id,
+        client_id=request.session["log_id"]
+    )
+
+    version = get_object_or_404(
+        DesignVersion,
+        id=version_id,
+        design=design
+    )
+
+    # ---------------------------------
+    # 1. Backup current design
+    # ---------------------------------
+
+    max_version = design.design_versions.aggregate(
+        max_version=Max("version")
+    )["max_version"]
+
+    next_version = (max_version or 0) + 1
+
+    backup_version = DesignVersion.objects.create(
+        design=design,
+        version=next_version,
+        room_type=design.room_type,
+        room_size=None,
+        design_style=design.design_style,
+        color_theme=design.color_theme,
+        lighting=design.lighting,
+        budget=design.budget,
+        design_plan=design.prompt,
+    )
+
+    # Backup current image
+    if design.generated_image:
+
+        with design.generated_image.open("rb") as image_file:
+
+            backup_version.generated_image.save(
+                f"version_{next_version}.png",
+                ContentFile(image_file.read()),
+                save=True
+            )
+
+    # ---------------------------------
+    # 2. Restore selected version
+    # ---------------------------------
+
+    design.room_type = version.room_type
+    design.design_style = version.design_style
+    design.color_theme = version.color_theme
+    design.lighting = version.lighting
+    design.budget = version.budget
+
+    design.prompt = version.design_plan
+
+    if version.generated_image:
+        design.generated_image = version.generated_image
+
+    design.status = "completed"
+
+    design.save()
+
+    return redirect(
+        "ai_room_result",
+        design_id=design.id
     )

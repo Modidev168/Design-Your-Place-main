@@ -1,0 +1,88 @@
+{% load static %}
+
+
+<link rel="stylesheet" href="{% static 'chatbot/chat.css' %}">
+
+<!-- Chatbot Floating Button -->
+<button id="chatbot-toggle" class="chatbot-toggle">
+    <i class="fa fa-comments"></i>
+</button>
+
+<!-- Chatbot Window -->
+<div id="chatbot-window" class="chatbot-window">
+
+    <!-- Header -->
+    <div class="chatbot-header">
+
+        <div class="chatbot-title">
+            <i class="fa fa-home"></i>
+            <span>AI Interior Assistant</span>
+        </div>
+
+        <div class="chatbot-actions">
+
+            <button
+                type="button"
+                id="chatbot-new-chat"
+                title="New conversation"
+            >
+                <i class="fa fa-plus"></i>
+            </button>
+
+            <button
+                type="button"
+                id="chatbot-close"
+                title="Close"
+            >
+                <i class="fa fa-times"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Messages -->
+    <div id="chatbot-messages" class="chatbot-messages">
+
+        <div class="chat-message bot-message">
+            <div class="message-avatar">
+                <i class="fa fa-home"></i>
+            </div>
+
+            <div class="message-content">
+                Hello 👋
+                <br>
+                I'm your AI Interior Assistant.
+                <br><br>
+                I can help you design your room. Let's start!
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Typing -->
+    <div id="chatbot-typing" class="chatbot-typing">
+        AI is typing...
+    </div>
+
+
+    <!-- Input -->
+    <div class="chatbot-input-area">
+
+        <input
+            type="text"
+            id="chatbot-input"
+            placeholder="Type your message..."
+            autocomplete="off"
+        >
+
+        <button id="chatbot-send">
+            <i class="fa fa-paper-plane"></i>
+        </button>
+
+    </div>
+
+</div>
+<script src="{% static 'chatbot/chat.js' %}"></script>

@@ -25,5 +25,7 @@ from myapp import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("",include("myapp.urls")),
+    path("api/chat/",include("chatbot.urls")),
+    path("chat/",include("chatbot.urls")),
 
 ]+ static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

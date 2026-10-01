@@ -4,6 +4,7 @@ urlpatterns = [
     path("login", views.loginpage,name='login'),
     # path("forgotpwd", views.forgotpwd),
     # path("forgotpassword", views.forgotpassword),
+    path("ai-room-result/<int:design_id>/restore/<int:version_id>/",views.restore_design_version,name="restore_design_version"),
 
     path("Register", views.registerpage, name="registerpage"),
     path("forgot-password/", views.forgot_password, name="forgot_password"),

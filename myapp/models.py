@@ -43,13 +43,13 @@ class packages(models.Model):
     ]
 
     # package_type=models.CharField(max_length=255)
-    Designer_Name = models.CharField(max_length=20)
-    package_design_style = models.CharField(max_length=10)
+    Designer_Name = models.CharField(max_length=255)
+    package_design_style = models.CharField(max_length=255)
     package_type = models.ForeignKey(Packagecategory, on_delete=models.CASCADE, null=True)
-    package_category = models.CharField(max_length=10)
-    BhkType = models.CharField(max_length=10,null=True)
+    package_category = models.CharField(max_length=255)
+    BhkType = models.CharField(max_length=255,null=True)
     package_price = models.FloatField()
-    time_duration = models.CharField(max_length=10)
+    time_duration = models.CharField(max_length=255)
     package_desc = models.TextField()
     package_img = models.ImageField(upload_to="photos")
     ExtraServices = MultiSelectField(choices=SERVICE_CHOICES, max_length=200)
@@ -81,10 +81,10 @@ class Portfoliocategory(models.Model):
 class portfolio(models.Model):
     Designer_Name = models.CharField(max_length=255, null=True)
     catid = models.ForeignKey(category, on_delete=models.CASCADE, null=True)
-    aboutyourself = models.CharField(max_length=40)
+    aboutyourself = models.TextField()
     designstyle = models.ForeignKey(Portfoliocategory, on_delete=models.CASCADE, null=True)
-    designerskill = models.TextField(max_length=20)
-    experience = models.CharField(max_length=50)
+    designerskill = models.TextField()
+    experience = models.TextField()
     sampleimage = models.ImageField(upload_to="photos")
     client_id = models.ForeignKey(registermodel,on_delete=models.CASCADE,null=True,related_name='client_portfolios')
     Designerid = models.ForeignKey(registermodel,on_delete=models.CASCADE,null=True,related_name='designer_portfolios')
@@ -109,19 +109,19 @@ class booking(models.Model):
         ('Space Planning', 'Space Planning'),
     ]
 
-    Client_Name = models.CharField(max_length=20)
-    design_style = models.CharField(max_length=10)
-    package_type = models.CharField(max_length=10)
-    package_category = models.CharField(max_length=10)
+    Client_Name = models.CharField(max_length=255)
+    design_style = models.CharField(max_length=255)
+    package_type = models.CharField(max_length=255)
+    package_category = models.CharField(max_length=255)
     quantity=models.IntegerField(null=True)
     totalamount=models.FloatField(null=True)
     date_time = models.DateTimeField()
     location = models.TextField()
-    BHKType = models.CharField(max_length=10)
+    BHKType = models.CharField(max_length=255,null=True)
     propertySize = models.FloatField()
-    Time_duration = models.CharField(max_length=10)
+    Time_duration = models.CharField(max_length=255)
     requirement = models.TextField()
-    status = models.CharField(max_length=10)
+    status = models.CharField(max_length=255)
     services = MultiSelectField(choices=SERVICE_CHOICES, max_length=200)
     client_id = models.ForeignKey(registermodel,on_delete=models.CASCADE,null=True,related_name='client_bookings')
     Designerid = models.ForeignKey(registermodel,on_delete=models.CASCADE,null=True,related_name='designer_bookings')
@@ -201,8 +201,14 @@ class AIRoomDesign(models.Model):
         ("Premium", "Premium"),
     ]
     client = models.ForeignKey('registermodel', related_name='ai_room_designs', on_delete=models.CASCADE)
+    chat_conversation = models.ForeignKey("chatbot.ChatConversation",on_delete=models.SET_NULL,null=True,blank=True,related_name="room_designs")
     original_image = models.ImageField(upload_to="ai_rooms/original/")
     room_type = models.CharField(max_length=30,choices=ROOM_TYPES)
+    room_size = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True
+    )
     design_style = models.CharField(max_length=30,choices=DESIGN_STYLES)
     prompt = models.TextField()
     generated_image = models.ImageField(upload_to="ai_rooms/generated/",blank=True, null=True)
@@ -211,6 +217,7 @@ class AIRoomDesign(models.Model):
     color_theme = models.CharField(max_length=30,choices=COLOR_THEMES,default="Neutral")
     lighting = models.CharField(max_length=30,choices=LIGHTING_CHOICES,default="Natural")
     is_saved = models.BooleanField(default=False)
+    
     budget = models.CharField(max_length=30,choices=BUDGET_CHOICES,default="Medium")
     parent_design = models.ForeignKey("self",on_delete=models.CASCADE,null=True,blank=True,related_name="versions")
     version = models.PositiveIntegerField(default=1)
@@ -218,3 +225,59 @@ class AIRoomDesign(models.Model):
     def __str__(self):
         return f"{self.client.fullname} - {self.room_type} - {self.design_style}"
 
+class DesignVersion(models.Model):
+
+    design = models.ForeignKey(
+        AIRoomDesign,
+        on_delete=models.CASCADE,
+        related_name="design_versions"
+    )
+
+    version = models.PositiveIntegerField()
+
+    room_type = models.CharField(
+        max_length=100
+    )
+
+    room_size = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    design_style = models.CharField(
+        max_length=100
+    )
+
+    color_theme = models.CharField(
+        max_length=100
+    )
+
+    lighting = models.CharField(
+        max_length=100
+    )
+
+    budget = models.CharField(
+        max_length=100
+    )
+
+    design_plan = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    generated_image = models.ImageField(
+        upload_to="ai_rooms/versions/",
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ["-version"]
+
+    def __str__(self):
+        return f"Design {self.design.id} - Version {self.version}"

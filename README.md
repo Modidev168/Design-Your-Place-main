@@ -4,7 +4,6 @@ A complete Interior Design Web Application built using Python and Django.
 This project allows clients to select design packages and get assigned professional designers by the admin.
 
 ---
-###############################################3
 ## 🚀 Features
 
 - 🔐 User Authentication (Login & Registration)
@@ -30,7 +29,6 @@ This project allows clients to select design packages and get assigned professio
 - HTML
 - CSS
 - JavaScript
-this is
 - SQLite
 
 ---

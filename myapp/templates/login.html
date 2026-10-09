@@ -164,7 +164,7 @@
         <div class="login-container">
             <h2 class="name">Welcome Back!</h2>
             
-            <form action="\checklogindata" method="POST">
+            <form action="{% url 'checklogindata' %}" method="POST">
                 {% csrf_token %}
                 <div class="input-group">
                     <label for="email"><b>Email</b></label>

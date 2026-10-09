@@ -1,3 +1,4 @@
+{% csrf_token %}
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
@@ -156,7 +157,7 @@
                          {% endfor %}
                         </li>
                         {% if request.session.log_name %}
-                        {% if request.session.log_role == "Client" %}
+                        {% if request.session.log_role == "client" %}
                         <li class="nav-item">
                             <a class="nav-link" href="showportfolio">Portfolio</a>
                         </li>
@@ -250,19 +251,19 @@
                     </ul>
                 </div>
 
-<div class="box">
-  <section id="portfolio" class="section">
-    <div class="portfolio-items">
-      {% for i in Portfolio %}
-      <div class="portfolio-item">
-        <h3>{{i.designstyle}}</h3>
-          <a href="\singleportfolio/{{ i.id }}"><img src="{{ i.sampleimage.url }}" alt="Portfolio 1"></a>
-        <h2>{{ i.Designer_Name }}</h2>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
-</div>
+                <div class="box">
+                  <section id="portfolio" class="section">
+                    <div class="portfolio-items">
+                      {% for i in Portfolio %}
+                      <div class="portfolio-item">
+                        <h3>{{i.designstyle}}</h3>
+                          <a href="\singleportfolio/{{ i.id }}"><img src="{{ i.sampleimage.url }}" alt="Portfolio 1"></a>
+                        <h2>{{ i.Designer_Name }}</h2>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </section>
+                </div>
 
       <!-- portfolio 2     -->
 <!--      <div class="portfolio-item">-->

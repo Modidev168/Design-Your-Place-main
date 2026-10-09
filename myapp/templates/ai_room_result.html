@@ -198,28 +198,39 @@
                                 ·
                                 ₹{{ version.budget }}
                             </small>
+
+                            <br>
+
+                            <small>
+                                {% if version.id == design.id %}
+                                    <strong>Current Version</strong>
+                                {% endif %}
+                            </small>
                         </div>
-                      <div class="d-flex gap-2">
 
-                          {% if version.generated_image %}
-                              <a
-                                  href="{{ version.generated_image.url }}"
-                                  target="_blank"
-                                  class="btn btn-primary btn-sm"
-                              >
-                                  View Image
-                              </a>
-                          {% endif %}
+                        <div class="d-flex gap-2">
 
-                          <a
-                              href="{% url 'restore_design_version' design.id version.id %}"
-                              class="btn btn-outline-secondary btn-sm"
-                              onclick="return confirm('Restore this design version?');"
-                          >
-                              Restore
-                          </a>
+                            {% if version.generated_image %}
+                                <a
+                                    href="{{ version.generated_image.url }}"
+                                    target="_blank"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    View Image
+                                </a>
+                            {% endif %}
 
-                      </div>
+                            {% if version.id != design.id %}
+                                <a
+                                    href="{% url 'restore_design_version' root_design.id version.id %}"
+                                    class="btn btn-outline-secondary btn-sm"
+                                    onclick="return confirm('Restore this design version?');"
+                                >
+                                    Restore
+                                </a>
+                            {% endif %}
+
+                        </div>
 
                     </div>
 
@@ -229,7 +240,7 @@
 
             </div>
         </div>
-        {% endif %}
+      {% endif %}
       <hr />
 
       <!-- DESIGN INFORMATION -->

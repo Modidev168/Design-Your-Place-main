@@ -224,7 +224,7 @@ RIGHT SIDEBAR TOGGLE SECTION
 
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
                     <ul class="navbar-nav ml-lg-auto">
-                        {% if request.session.log_name%}
+                    {% if request.session.log_id %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -235,7 +235,7 @@ RIGHT SIDEBAR TOGGLE SECTION
                                 <a class="dropdown-item" href="/categorywiseportfolio/{{i.id}}">{{i.Portcatname}}</a>
                                 {% endfor %}
                                 <a class="dropdown-item" href="/showportfolio">All Portfolio</a>
-                               {%if request.session.log_role == "Designer" %}
+                               {%if request.session.log_role == "designer" %}
                                     <a class="dropdown-item" href="/myportfolios">My Portfolio</a>
                                 {%endif%}
                             </div>
@@ -253,14 +253,14 @@ RIGHT SIDEBAR TOGGLE SECTION
                                     <a class="dropdown-item" href="/categorywisepackage/{{i.id}}">{{i.Packcatname}}</a>
                                  {% endfor %}
                                     <a class="dropdown-item" href="/showpackage">All Packages</a>
-                                {%if request.session.log_role == "Designer" %}
+                                {%if request.session.log_role == "designer" %}
                                     <a class="dropdown-item" href="/mypackages">My Packages</a>
                                 {%endif%}
                         </div>
                         </li>
-                        {% endif %}
-                        {% if request.session.log_name %}
-                        {% if request.session.log_role == "Designer" %}
+                    {% endif %}
+                        {% if request.session.log_id %}
+                        {% if request.session.log_role == "designer" %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -276,7 +276,7 @@ RIGHT SIDEBAR TOGGLE SECTION
                         </li>
 
                         {% endif %}
-                        {% if request.session.log_role == "Client" %}
+                        {% if request.session.log_role == "client" %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -294,7 +294,7 @@ RIGHT SIDEBAR TOGGLE SECTION
                         <a class="nav-link" href="/contact">Contact Us</a>
                     </li>
                     {% endif %}
-                    
+                    {% if request.session.log_role == "client" or request.session.log_role == "admin" %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'ai_room_designer' %}">✨ AI Room Designer</a>
                     </li>
@@ -303,12 +303,14 @@ RIGHT SIDEBAR TOGGLE SECTION
                                 🖼️ Design History
                             </a>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">LogOut</a>
                     </li>
                         <li class="nav-item">
                             <img src="../../static/images/User.png"  height="30px" width="50px" alt="User">
                             <span class="nav-link">{{ request.session.log_name }}</span>
+                        </li>
                         {% else %}
 
                         <li class="nav-item dropdown">

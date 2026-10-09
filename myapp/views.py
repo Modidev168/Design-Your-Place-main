@@ -6,6 +6,7 @@ from os import remove
 from django.http import request
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
+from django.contrib.auth.hashers import check_password
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -22,6 +23,48 @@ from .ai_service import generate_room_design
 from django.db.models import Q
 from django.contrib.auth import login
 from django.contrib.auth.models import User
+from functools import wraps
+from django.contrib.auth import login, logout as django_logout
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+
+def login_required_custom(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+
+        if not request.session.get("log_id"):
+            messages.error(request, "Please login first.")
+            return redirect("login")
+
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
+def role_required(*allowed_roles):
+    def decorator(view_func):
+
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+
+            if not request.session.get("log_id"):
+                messages.error(request, "Please login first.")
+                return redirect("login")
+
+            user_role = request.session.get("log_role")
+
+            if user_role not in allowed_roles:
+                messages.error(
+                    request,
+                    "You do not have permission to access this page."
+                )
+                return redirect("showportfolio")
+
+            return view_func(request, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 def base():
     packages = Packagecategory.objects.all()
@@ -35,46 +78,55 @@ def base():
 
 # Create your views here.
 def registerpage(request):
+    if request.session.get("log_id"):
+        return redirect("showportfolio")
+
     context = base()
-    print(context)
     return render(request, "Register.html", context)
 
 
-def fetchregisterdata(request):  # insert data into model
+def loginpage(request):
+    if request.session.get("log_id"):
+        return redirect("showportfolio")
+
+    context = base()
+    return render(request, "login.html", context)
+
+def fetchregisterdata(request):
+
     fullname = request.POST.get("fullname")
     email = request.POST.get("email")
-    password = make_password(request.POST.get("password"))
-    confirmpassword = make_password(request.POST.get("confirmpassword"))
+    raw_password = request.POST.get("password")
+    confirm_password = request.POST.get("confirmpassword")
     phone = request.POST.get("phone")
-    identyCard = request.FILES["Identy_Card"]
-    role = request.POST["role"]
+    identyCard = request.FILES.get("Identy_Card")
 
-    # from to varrible
-    print("fullname=", fullname)
-    print("email=", email)
-    print("password=", password)
-    print("confirmpassword=", confirmpassword)
-    print("phone=", phone)
-    print("identitycard=", identyCard)
-    print("role", role)
+    if raw_password != confirm_password:
+        messages.error(request, "Passwords do not match.")
+        return redirect("registerpage")
 
-    # varriable to database
-    insertquery = registermodel(fullname=fullname, email=email, password=password,
-                                phone=phone, Identy_Card=identyCard, Role=role)
-    insertquery.save()  # saved to quary
+    # Public registration = CLIENT only
+    role = "client"
 
-    print("registerd")
-    return render(request, "login.html")  # succesful register after rebder to login page
+    insertquery = registermodel(
+        fullname=fullname,
+        email=email,
+        password=make_password(raw_password),
+        phone=phone,
+        Identy_Card=identyCard,
+        Role=role
+    )
+
+    insertquery.save()
+
+    messages.success(request, "Registration successful. Please login.")
+
+    return redirect("login")
 
 
-def loginpage(request):
-    context = base()
-    print(context)
-    return render(request, "login.html", context)
 
 
 # register and login is same or not check to email and password
-from django.contrib.auth.hashers import check_password
 
 def checklogindata(request):
 
@@ -90,6 +142,30 @@ def checklogindata(request):
         return render(request, "login.html")
 
 
+    # if check_password(userpassword, userdata.password):
+
+    #     request.session["log_id"] = userdata.id
+    #     request.session["log_name"] = userdata.fullname
+    #     request.session["log_email"] = userdata.email
+    #     request.session["log_role"] = userdata.Role
+
+    #     django_user = User.objects.filter(email=userdata.email).first()
+
+    #     if not django_user:
+    #         django_user = User.objects.create_user(
+    #             username=userdata.email,
+    #             email=userdata.email,
+    #             first_name=userdata.fullname,
+    #         )
+
+    #     login(request, django_user)
+    #     print("Login Successful")
+    #     print("REGISTERMODEL ID:", userdata.id)
+    #     print("DJANGO USER ID:", django_user.id)
+    #     print("DJANGO USERNAME:", django_user.username)
+
+    #     return redirect("showportfolio")
+
     if check_password(userpassword, userdata.password):
 
         request.session["log_id"] = userdata.id
@@ -97,20 +173,30 @@ def checklogindata(request):
         request.session["log_email"] = userdata.email
         request.session["log_role"] = userdata.Role
 
-        django_user, created = User.objects.get_or_create(
-            username=userdata.email,
-            defaults={
-                "email": userdata.email,
-                "first_name": userdata.fullname,
-            }
-        )
+        print("BEFORE DJANGO LOGIN:")
+        print("log_id:", request.session.get("log_id"))
+        print("log_name:", request.session.get("log_name"))
+        print("log_email:", request.session.get("log_email"))
+        print("log_role:", request.session.get("log_role"))
+
+        django_user = User.objects.filter(email=userdata.email).first()
+
+        if not django_user:
+            django_user = User.objects.create_user(
+                username=userdata.email,
+                email=userdata.email,
+                first_name=userdata.fullname,
+            )
 
         login(request, django_user)
 
-        print("Login Successful")
-        print("REGISTERMODEL ID:", userdata.id)
-        print("DJANGO USER ID:", django_user.id)
-        print("DJANGO USERNAME:", django_user.username)
+        print("AFTER DJANGO LOGIN:")
+        print("log_id:", request.session.get("log_id"))
+        print("log_name:", request.session.get("log_name"))
+        print("log_email:", request.session.get("log_email"))
+        print("log_role:", request.session.get("log_role"))
+
+        print("AUTHENTICATED:", request.user.is_authenticated)
 
         return redirect("showportfolio")
 
@@ -120,19 +206,10 @@ def checklogindata(request):
         return render(request, "login.html")
 
 def logout(request):
-    context = base()
-    print(context)
+    django_logout(request)
+    request.session.flush()
 
-    try:
-        del request.session["log_id"]
-        del request.session["log_name"]
-        del request.session["log_email"]
-        del request.session["log_role"]
-
-    except:
-        pass
-
-    return render(request, "index.html", context)
+    return redirect("index")
 
 
 def indexpage(request):
@@ -159,12 +236,14 @@ def Commercialpage(request):
     return render(request, "Commercial.html", context)
 
 
+@role_required("designer", "admin")
 def addportfoliopage(request):
     context = base()
     print(context)
     return render(request, "addportfolio.html", context)
 
 
+@role_required("designer", "admin")
 def fetchportfoliodata(request):
     # fetch portfolio data
     Designer_Name = request.POST.get("Designer_Name")
@@ -200,40 +279,83 @@ def fetchportfoliodata(request):
     return render(request, "addportfolio.html")
 
 
+@role_required("designer", "admin")
 def edit_portfolio(request, portfolio_id):
-    edit_portfolio = get_object_or_404(portfolio, id=portfolio_id)
 
-    # Fetch all portfolio categories for dropdowns
+    if request.session.get("log_role") == "admin":
+        edit_portfolio = get_object_or_404(
+            portfolio,
+            id=portfolio_id
+        )
+    else:
+        edit_portfolio = get_object_or_404(
+            portfolio,
+            id=portfolio_id,
+            Designerid=request.session["log_id"]
+        )
+
     design_styles = Portfoliocategory.objects.all()
 
-    return render(request, "editportfolio.html", {
-        "edit_portfolio": edit_portfolio,
-        "design_styles": design_styles,
-    })
+    return render(
+        request,
+        "editportfolio.html",
+        {
+            "edit_portfolio": edit_portfolio,
+            "design_styles": design_styles,
+        }
+    )
 
-
+@role_required("designer", "admin")
 def update_portfolio(request, portfolio_id):
-    edit_portfolio = get_object_or_404(portfolio, id=portfolio_id)
+
+    if request.session.get("log_role") == "admin":
+
+        edit_portfolio = get_object_or_404(
+            portfolio,
+            id=portfolio_id
+        )
+
+    else:
+
+        edit_portfolio = get_object_or_404(
+            portfolio,
+            id=portfolio_id,
+            Designerid=request.session["log_id"]
+        )
 
     if request.method == "POST":
+
         edit_portfolio.Designer_Name = request.POST.get("Designer_Name")
         edit_portfolio.aboutyourself = request.POST.get("about")
-        edit_portfolio.designstyle = Portfoliocategory.objects.get(id=request.POST.get("Design_style"))
+
+        edit_portfolio.designstyle = get_object_or_404(
+            Portfoliocategory,
+            id=request.POST.get("Design_style")
+        )
+
         edit_portfolio.category = request.POST.get("Category")
         edit_portfolio.designerskill = request.POST.get("skills")
         edit_portfolio.experience = request.POST.get("experience")
 
-        # If a new image is uploaded, update it
         if "work-upload" in request.FILES:
             edit_portfolio.sampleimage = request.FILES["work-upload"]
 
         edit_portfolio.save()
-        messages.success(request, "Portfolio updated successfully!")
 
-        return redirect(manageportfoliopage)
+        messages.success(
+            request,
+            "Portfolio updated successfully!"
+        )
 
-    return render(request, "editportfolio.html", {"edit_portfolio": edit_portfolio})
+        return redirect("manageportfolio")
 
+    return render(
+        request,
+        "editportfolio.html",
+        {
+            "edit_portfolio": edit_portfolio
+        }
+    )
 
 def showportfoliopage(request):
     # fetch portfolio data
@@ -269,32 +391,55 @@ def categorywiseportfolio(request, id):
     return render(request, "categorywiseprotfolio.html", context)
 
 
+@role_required("designer", "admin")
 def manageportfoliopage(request):
-    designer_id_loggedin = request.session["log_id"]
-    fetchdata = portfolio.objects.filter(Designerid=designer_id_loggedin)
-    context = {
-        "data": fetchdata,
-    }
-    return render(request, "manageportfolio.html", context)
 
+    if request.session.get("log_role") == "admin":
+        fetchdata = portfolio.objects.all()
 
+    else:
+        fetchdata = portfolio.objects.filter(
+            Designerid=request.session["log_id"]
+        )
+
+    context = {"data": fetchdata,}
+
+    return render(request,"manageportfolio.html",context)
+
+@role_required("designer", "admin")
 def deleteportfolio(request, id):
-    context = base()
-    print(context)
-    print(id)
 
-    # delete from portfolio where id=id
-    portfolio.objects.get(id=id).delete()
+    if request.session.get("log_role") == "admin":
 
-    messages.success(request, "Portfolio deleted successfully.")
-    return redirect("/manageportfolio",context)
+        portfolio_data = get_object_or_404(
+            portfolio,
+            id=id
+        )
 
+    else:
 
+        portfolio_data = get_object_or_404(
+            portfolio,
+            id=id,
+            Designerid=request.session["log_id"]
+        )
+
+    portfolio_data.delete()
+
+    messages.success(
+        request,
+        "Portfolio deleted successfully."
+    )
+
+    return redirect("manageportfolio")
+
+@role_required("designer", "admin")
 def addpackagepage(request):
     context = base()
     return render(request, "addpackage.html", context)
 
 
+@role_required("designer", "admin")
 def fetchpackagedata(request):  # insert data into  packagemodel
     # fetch package data
     context = base()
@@ -335,7 +480,7 @@ def fetchpackagedata(request):  # insert data into  packagemodel
     print("data is inserted ")
     return render(request, "addpackage.html", context)
 
-
+@role_required("designer", "admin")
 def mypackages(request):
     uid = request.session["log_id"]
     # fetch package data
@@ -349,7 +494,7 @@ def mypackages(request):
 
     return render(request, "showpackage.html", context)
 
-
+@role_required("designer", "admin")
 def myportfolios(request):
     uid = request.session["log_id"]
     # fetch package data
@@ -406,16 +551,30 @@ def categorywisepackagepage(request, id):
     return render(request, "categorywisepackage.html", context)
 
 
+@role_required("designer", "admin")
 def managepackagepage(request):
-    designer_id_loggedin = request.session["log_id"]
 
-    fetchdata = packages.objects.filter(Designerid=designer_id_loggedin)
+    if request.session.get("log_role") == "admin":
+
+        fetchdata = packages.objects.all()
+
+    else:
+
+        fetchdata = packages.objects.filter(
+            Designerid=request.session["log_id"]
+        )
+
     context = {
         "data": fetchdata,
     }
-    return render(request, "managepackage.html", context)
 
+    return render(
+        request,
+        "managepackage.html",
+        context
+    )
 
+@role_required("designer", "admin")
 def deletepackage(request, id):
     context = base()
     print(context)
@@ -427,7 +586,84 @@ def deletepackage(request, id):
     messages.success(request, "Package deleted successfully.")
     return redirect("/managepackage",context)
 
+@role_required("designer", "admin")
+def edit_package(request, package_id):
 
+    if request.session.get("log_role") == "admin":
+
+        package = get_object_or_404(
+            packages,
+            id=package_id
+        )
+
+    else:
+
+        package = get_object_or_404(
+            packages,
+            id=package_id,
+            Designerid=request.session["log_id"]
+        )
+
+    if request.method == "POST":
+
+        package.Designer_Name = request.POST.get("Designer_Name")
+
+        package.package_type = get_object_or_404(
+            Packagecategory,
+            id=request.POST.get("Package-type")
+        )
+
+        package.package_design_style = request.POST.get(
+            "Design_style"
+        )
+
+        package.package_category = request.POST.get(
+            "category"
+        )
+
+        package.BhkType = request.POST.get(
+            "bhkType"
+        )
+
+        package.package_price = request.POST.get(
+            "price"
+        )
+
+        package.time_duration = request.POST.get(
+            "duration"
+        )
+
+        package.package_desc = request.POST.get(
+            "Package-desc"
+        )
+
+        if "Package-Images" in request.FILES:
+            package.package_img = request.FILES[
+                "Package-Images"
+            ]
+
+        package.ExtraServices = request.POST.getlist(
+            "services"
+        )
+
+        package.save()
+
+        messages.success(
+            request,
+            "Package updated successfully"
+        )
+
+        return redirect("managepackage")
+
+    return render(
+        request,
+        "editpackage.html",
+        {
+            "editpackage": package
+        }
+    )
+
+@role_required("client")
 def bookingpage(request, pack_id):
     context = base()
     packagesdetails = packages.objects.get(id=pack_id)
@@ -443,10 +679,25 @@ def bookingpage(request, pack_id):
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
+@role_required("client")
 def featchbooking(request):
+
     context = base()
+
     if request.method == "POST":
-        # Fetch package data
+
+        package_id = request.POST.get("package_id")
+
+        package = get_object_or_404(
+            packages,
+            id=package_id
+        )
+
+        client = get_object_or_404(
+            registermodel,
+            id=request.session["log_id"]
+        )
+
         Client_Name = request.POST.get("Client_Name")
         packagetype = request.POST.get("Package-type")
         designstyle = request.POST.get("Design_style")
@@ -458,58 +709,106 @@ def featchbooking(request):
         Time_duration = request.POST.get("Time_duration")
         requirment = request.POST.get("requirement")
         services = request.POST.getlist("services")
-        package_id = request.POST.get("package_id")
         total_package = request.POST.get("total_price")
 
-        package = packages.objects.get(id=package_id)
-        half_payment = float(total_package) / 2  # Calculate 50% payment
+        half_payment = float(total_package) / 2
 
-        # Insert booking
-        insertquery = booking(Client_Name=Client_Name, package_type=packagetype, design_style=designstyle,
-                              totalamount=total_package,
-                              package_category=packagecategory, date_time=datetime, location=location,
-                              BHKType=BHKType, propertySize=propertySize, Time_duration=Time_duration,
-                              status="Pending", requirement=requirment, services=",".join(services), package_id=package)
+        insertquery = booking(
+            client_id=client,
+            Client_Name=Client_Name,
+            package_type=packagetype,
+            design_style=designstyle,
+            totalamount=total_package,
+            package_category=packagecategory,
+            date_time=datetime,
+            location=location,
+            BHKType=BHKType,
+            propertySize=propertySize,
+            Time_duration=Time_duration,
+            status="Pending",
+            requirement=requirment,
+            services=",".join(services),
+            package_id=package
+        )
+
         insertquery.save()
 
-        # Create Razorpay Order
         order_data = {
-            "amount": int(half_payment * 100),  # Convert to paisa
+            "amount": int(half_payment * 100),
             "currency": "INR",
             "receipt": str(insertquery.id),
-            "payment_capture": 1  # Auto capture payment
+            "payment_capture": 1
         }
-        razorpay_order = razorpay_client.order.create(order_data)
 
-        # Save payment record
-        payment = Payment(booking=insertquery, razorpay_order_id=razorpay_order['id'], amount=half_payment,
-                          status="Pending")
+        razorpay_order = razorpay_client.order.create(
+            order_data
+        )
+
+        payment = Payment(
+            booking=insertquery,
+            razorpay_order_id=razorpay_order["id"],
+            amount=half_payment,
+            status="Pending"
+        )
+
         payment.save()
 
-        return redirect("payment_page", order_id=razorpay_order['id'])
+        return redirect(
+            "payment_page",
+            order_id=razorpay_order["id"]
+        )
 
-    return render(request, "booking.html", context)
+    return render(
+        request,
+        "booking.html",
+        context
+    )
 
-
+@role_required("client", "admin")
 def payment_history(request):
+
     context = base()
-    payments = Payment.objects.filter(booking__Client_Name=request.session["log_name"])  # Filter payments for this user
-    context.update({'payments': payments})
-    return render(request, 'paymenthistory.html', context)
 
+    if request.session.get("log_role") == "admin":
 
+        payments = Payment.objects.all()
+
+    else:
+
+        payments = Payment.objects.filter(
+            booking__client_id=request.session["log_id"]
+        )
+
+    context.update({
+        "payments": payments
+    })
+
+    return render(
+        request,
+        "paymenthistory.html",
+        context
+    )
+
+@role_required("client")
 def managebookingpage(request):
+
     context = base()
 
-    fetchdata = booking.objects.filter(Client_Name=request.session["log_name"])
-    print(fetchdata)
+    fetchdata = booking.objects.filter(
+        client_id=request.session["log_id"]
+    )
+
     context.update({
         "data": fetchdata,
     })
 
-    return render(request, "managebooking.html", context)
+    return render(
+        request,
+        "managebooking.html",
+        context
+    )
 
-
+@role_required("designer", "admin")
 def desmanagebookingpage(request):
     context = base()
     client_id_loggedin = request.session["log_id"]
@@ -521,7 +820,7 @@ def desmanagebookingpage(request):
 
     return render(request, "managebooking.html", context)
 
-
+@role_required("client")
 def insertintobooking(request):
     context = base()
     print(context)
@@ -547,7 +846,7 @@ def insertintobooking(request):
             insertquery.save()
     return redirect("Booking.html",context)
 
-
+@role_required("designer", "admin")
 def showbooking(request):
     client_id = request.session["log_id"]
     fetchdata = booking.objects.filter(client_id=client_id)
@@ -558,13 +857,33 @@ def showbooking(request):
     return render(request, "booking.html", context)
 
 
+@role_required("client", "admin")
 def cancelbooking(request, id):
-    context = base()
-    bookingdata = booking.objects.get(id=id)
-    bookingdata.status = "canceled"
-    bookingdata.save()
-    return redirect(indexpage)
 
+    if request.session.get("log_role") == "admin":
+
+        bookingdata = get_object_or_404(
+            booking,
+            id=id
+        )
+
+    else:
+
+        bookingdata = get_object_or_404(
+            booking,
+            id=id,
+            client_id=request.session["log_id"]
+        )
+
+    bookingdata.status = "canceled"
+    bookingdata.save(update_fields=["status"])
+
+    messages.success(
+        request,
+        "Booking canceled successfully."
+    )
+
+    return redirect("managebooking")
 
 def contactpage(request):
     context = base()
@@ -599,31 +918,50 @@ def full_image_view(request, package_id):
     package = get_object_or_404(packages, id=package_id)  # Correct way to fetch the package
     return render(request, 'full_image.html', {'package': package},context)  # Use singular name
 
-
+@role_required("client")
 def reviewpage(request):
     context = base()
     print(context)
     return render(request, "Review.html",context)
 
 
+@role_required("client")
 def fetchreviewdata(request):
+
     context = base()
-    name = request.POST.get("name")
-    star = request.POST.get("star")
-    review_text = request.POST.get("review")  # ✅ Rename variable to avoid conflicts
 
-    print(name)
-    print(star)
-    print(review_text)
+    if request.method == "POST":
 
-    insertquery = review(name=name, star=int(star), review=review_text)  # ✅ Use correct model name
-    insertquery.save()
+        name = request.POST.get("name")
+        star = request.POST.get("star")
+        review_text = request.POST.get("review")
 
-    messages.success(request, "Review submitted successfully!")
+        client = get_object_or_404(
+            registermodel,
+            id=request.session["log_id"]
+        )
 
-    return render(request, "Review.html",context)
+        insertquery = review(
+            client_id=client,
+            name=name,
+            star=int(star),
+            review=review_text
+        )
 
+        insertquery.save()
 
+        messages.success(
+            request,
+            "Review submitted successfully!"
+        )
+
+    return render(
+        request,
+        "Review.html",
+        context
+    )
+
+@role_required("client")
 def managereviewpage(request):
     client_id_loggedin = request.session["log_id"]
     fetchdata = review.objects.filter(client_id=client_id_loggedin)
@@ -640,11 +978,8 @@ def thankyoupage(request):
     return render(request, "thankyoupage.html")
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-
-
 @csrf_exempt
+@role_required("client")
 def payment_success(request):
     if request.method == "POST":
         order_id = request.POST.get("razorpay_order_id")
@@ -672,7 +1007,7 @@ def payment_success(request):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
-
+@role_required("client")
 def payment_page(request, order_id):
     try:
         payment = Payment.objects.get(razorpay_order_id=order_id)
@@ -687,108 +1022,6 @@ def payment_page(request, order_id):
         "key": settings.RAZORPAY_KEY_ID,  # Your Razorpay Key
     }
     return render(request, "payment_page.html", context)
-
-
-def edit_package(request, package_id):
-    package = get_object_or_404(packages, id=package_id)
-
-    if request.method == "POST":
-        package.Designer_Name = request.POST.get("Designer_Name")
-        package.package_type = Packagecategory.objects.get(id=request.POST.get("Package-type"))
-        package.package_design_style = request.POST.get("Design_style")
-        package.package_category = request.POST.get("category")
-        package.BhkType = request.POST.get("bhkType")
-        package.package_price = request.POST.get("price")
-        package.time_duration = request.POST.get("duration")
-        package.package_desc = request.POST.get("Package-desc")
-
-        if "Package-Images" in request.FILES:
-            package.package_img = request.FILES["Package-Images"]
-
-        package.ExtraServices = request.POST.getlist("services")
-        package.save()
-
-        messages.success(request, "Package updated successfully")
-        return redirect(managepackagepage)  # Redirect to a package list or detail page
-
-    return render(request, "editpackage.html", {"editpackage": package})
-
-
-# def forgotpwd(request):
-#     context = base()
-#     print(context)
-#     return render(request, "forgotpassword.html",context)
-
-
-# def forgotpassword(request):
-#     if request.method == 'POST':
-#         username = request.POST.get('email')
-
-#         try:
-#             user = registermodel.objects.get(email=username)
-
-#         except registermodel.DoesNotExist:
-#             user = None
-
-#         if user is not None:
-#             #################### Password Generation ##########################
-#             import random
-#             letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-#                        't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-#                        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-#             numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-#             symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
-
-#             nr_letters = 6
-#             nr_symbols = 1
-#             nr_numbers = 3
-#             password_list = []
-
-#             for char in range(1, nr_letters + 1):
-#                 password_list.append(random.choice(letters))
-
-#             for char in range(1, nr_symbols + 1):
-#                 password_list += random.choice(symbols)
-
-#             for char in range(1, nr_numbers + 1):
-#                 password_list += random.choice(numbers)
-
-#             print(password_list)
-#             random.shuffle(password_list)
-#             print(password_list)
-
-#             password = ""  # we will get final password in this var.
-#             for char in password_list:
-#                 password += char
-
-#             ##############################################################
-
-#             msg = "hello here it is your new password  " + password  # this variable will be passed as message in mail
-
-#             ############ code for sending mail ########################
-
-#             from django.core.mail import send_mail
-
-#             send_mail(
-#                 'Your New Password',
-#                 msg,
-#                 'modidev747@gmail.com',
-#                 [username],
-#                 fail_silently=False,
-#             )
-
-#             # now update the password in model
-#             cuser = registermodel.objects.get(email=username)
-#             cuser.password = password
-#             cuser.confirmpassword = password
-#             cuser.save(update_fields=['password'])
-
-#             print('Mail sent')
-#             messages.info(request, 'mail is sent successfully to your registered email')
-#             return redirect(indexpage)
-#         else:
-#             messages.info(request, 'This account does not exist')
-#     return redirect(indexpage)
 
 
 def forgot_password(request):
@@ -968,6 +1201,7 @@ def showreview(request):
 
     return render(request, "showreview.html",context)
 
+@role_required("client", "admin")
 def ai_room_designer(request):
 
     if 'log_id' not in request.session:
@@ -1095,46 +1329,61 @@ def ai_room_designer(request):
 
 #     if 'log_id' not in request.session:
 #         return redirect("login")
-#     print("========== RESULT DEBUG ==========")
-#     print("Requested design:", design_id)
-#     print("Session log_id:", request.session["log_id"])
+
+#     print("RESULT DESIGN ID:", design_id)
+#     print("SESSION LOG ID:", request.session.get("log_id"))
+
 #     design = AIRoomDesign.objects.get(
 #         id=design_id,
 #         client_id=request.session["log_id"]
 #     )
 
+#     versions = design.design_versions.all()
+
 #     return render(
 #         request,
 #         "ai_room_result.html",
 #         {
-#             "design": design
+#             "design": design,
+#             "versions": versions,
 #         }
 #     )
 
+@role_required("client", "admin")
 def ai_room_result(request, design_id):
 
-    if 'log_id' not in request.session:
-        return redirect("login")
+    # Get the requested design with ownership protection
+    if request.session.get("log_role") == "admin":
+        design = get_object_or_404(
+            AIRoomDesign,
+            id=design_id
+        )
+    else:
+        design = get_object_or_404(
+            AIRoomDesign,
+            id=design_id,
+            client_id=request.session["log_id"]
+        )
 
-    print("RESULT DESIGN ID:", design_id)
-    print("SESSION LOG ID:", request.session.get("log_id"))
+    # Find the root/original design
+    root_design = design
 
-    design = AIRoomDesign.objects.get(
-        id=design_id,
-        client_id=request.session["log_id"]
-    )
+    while root_design.parent_design:
+        root_design = root_design.parent_design
 
-    versions = design.design_versions.all()
+    # Get all versions belonging to this design
+    versions = AIRoomDesign.objects.filter(
+        Q(id=root_design.id) |
+        Q(parent_design=root_design)
+    ).order_by("version")
 
-    return render(
-        request,
-        "ai_room_result.html",
-        {
-            "design": design,
-            "versions": versions,
-        }
-    )
+    return render(request, "ai_room_result.html", {
+        "design": design,
+        "versions": versions,
+        "root_design": root_design,
+    })
 
+@role_required("client", "admin")
 def ai_room_history(request):
 
     if 'log_id' not in request.session:
@@ -1154,24 +1403,20 @@ def ai_room_history(request):
         }
     )
 
+@role_required("client", "admin")
 def ai_room_edit(request, design_id):
 
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    # ==========================================
-    # GET CURRENT DESIGN
-    # ==========================================
-
-    old_design = get_object_or_404(
-        AIRoomDesign,
-        id=design_id,
-        client_id=request.session["log_id"]
-    )
-
-    # ==========================================
-    # POST
-    # ==========================================
+    if request.session.get("log_role") == "admin":
+        old_design = get_object_or_404(
+            AIRoomDesign,
+            id=design_id
+        )
+    else:
+        old_design = get_object_or_404(
+            AIRoomDesign,
+            id=design_id,
+            client_id=request.session["log_id"]
+        )
 
     if request.method == "POST":
 
@@ -1181,142 +1426,87 @@ def ai_room_edit(request, design_id):
         ).strip()
 
         if not edit_prompt:
-
             messages.error(
                 request,
                 "Please enter what you want to change."
             )
-
             return redirect(
                 "ai_room_edit",
                 design_id=design_id
             )
 
-        # ==========================================
+        # -----------------------------------------
         # FIND ROOT DESIGN
-        # ==========================================
+        # -----------------------------------------
 
         root_design = old_design
 
         while root_design.parent_design:
-
             root_design = root_design.parent_design
 
-        # ==========================================
+        # -----------------------------------------
         # FIND NEXT VERSION
-        # ==========================================
+        # -----------------------------------------
 
         last_version = AIRoomDesign.objects.filter(
             parent_design=root_design
         ).order_by("-version").first()
 
         if last_version:
-
             next_version = last_version.version + 1
-
         else:
-
             next_version = old_design.version + 1
 
-        # ==========================================
-        # CREATE NEW VERSION
-        # ==========================================
+        # -----------------------------------------
+        # CREATE NEW DESIGN VERSION
+        # -----------------------------------------
 
         new_design = AIRoomDesign.objects.create(
-
             client=old_design.client,
-
-            # Keep original room image
             original_image=old_design.original_image,
-
             room_type=old_design.room_type,
-
+            room_size=old_design.room_size,
             design_style=old_design.design_style,
-
             color_theme=old_design.color_theme,
-
             lighting=old_design.lighting,
-
             budget=old_design.budget,
-
             prompt=edit_prompt,
-
             status="processing",
-
-            # ======================================
-            # VERSIONING
-            # ======================================
-
             parent_design=root_design,
-
             version=next_version
         )
 
-        print("====================================")
-        print("AI VERSION GENERATION")
-        print("Root Design:", root_design.id)
-        print("Old Design:", old_design.id)
-        print("New Design:", new_design.id)
-        print("Version:", next_version)
-        print("Edit Prompt:", edit_prompt)
-        print("====================================")
-
         try:
 
-            # ==========================================
-            # GENERATE IMAGE
-            # ==========================================
+            # -----------------------------------------
+            # GENERATE NEW IMAGE
+            # -----------------------------------------
 
-            generated_image = generate_room_design(
-                new_design
-            )
+            image_base64 = generate_room_design(new_design)
 
-            print(
-                "AI image generated successfully"
-            )
+            # -----------------------------------------
+            # SAVE GENERATED IMAGE
+            # -----------------------------------------
 
-            # ==========================================
-            # BASE64 → BYTES
-            # ==========================================
-
-            image_bytes = base64.b64decode(
-                generated_image
-            )
-
-            # ==========================================
-            # SAVE IMAGE
-            # ==========================================
+            image_data = base64.b64decode(image_base64)
 
             new_design.generated_image.save(
-
                 f"room_design_{new_design.id}.png",
-
-                ContentFile(image_bytes),
-
+                ContentFile(image_data),
                 save=False
             )
 
-            # ==========================================
-            # COMPLETE
-            # ==========================================
+            # -----------------------------------------
+            # MARK AS COMPLETED
+            # -----------------------------------------
 
             new_design.status = "completed"
 
             new_design.save()
 
-            print("====================================")
-            print("AI VERSION COMPLETED")
-            print("Design ID:", new_design.id)
-            print("Version:", new_design.version)
-            print(
-                "Generated:",
-                new_design.generated_image.name
-            )
-            print("====================================")
-
             messages.success(
                 request,
-                f"Design version {new_design.version} created successfully!"
+                "Your room design has been updated successfully."
             )
 
             return redirect(
@@ -1327,42 +1517,234 @@ def ai_room_edit(request, design_id):
         except Exception as e:
 
             print("====================================")
-            print("AI VERSION ERROR")
-            print(e)
+            print("AI EDIT GENERATION ERROR")
+            print(str(e))
             print("====================================")
 
             new_design.status = "failed"
-
-            new_design.save(
-                update_fields=["status"]
-            )
+            new_design.save(update_fields=["status"])
 
             messages.error(
                 request,
-                "AI generation failed. Please try again."
+                "Unable to generate the updated room design."
             )
 
             return redirect(
-                "ai_room_result",
-                design_id=new_design.id
+                "ai_room_edit",
+                design_id=design_id
             )
 
-    # ==========================================
-    # GET EDIT PAGE
-    # ==========================================
+    return render(request, "ai_room_edit.html", {
+        "design": old_design
+    })
 
-    return render(
-        request,
-        "ai_room_edit.html",
-        {
-            "design": old_design
-        }
-    )
+# def ai_room_edit(request, design_id):
 
+#     if 'log_id' not in request.session:
+#         return redirect("login")
+
+#     # ==========================================
+#     # GET CURRENT DESIGN
+#     # ==========================================
+
+#     old_design = get_object_or_404(
+#         AIRoomDesign,
+#         id=design_id,
+#         client_id=request.session["log_id"]
+#     )
+
+#     # ==========================================
+#     # POST
+#     # ==========================================
+
+#     if request.method == "POST":
+
+#         edit_prompt = request.POST.get(
+#             "edit_prompt",
+#             ""
+#         ).strip()
+
+#         if not edit_prompt:
+
+#             messages.error(
+#                 request,
+#                 "Please enter what you want to change."
+#             )
+
+#             return redirect(
+#                 "ai_room_edit",
+#                 design_id=design_id
+#             )
+
+#         # ==========================================
+#         # FIND ROOT DESIGN
+#         # ==========================================
+
+#         root_design = old_design
+
+#         while root_design.parent_design:
+
+#             root_design = root_design.parent_design
+
+#         # ==========================================
+#         # FIND NEXT VERSION
+#         # ==========================================
+
+#         last_version = AIRoomDesign.objects.filter(
+#             parent_design=root_design
+#         ).order_by("-version").first()
+
+#         if last_version:
+
+#             next_version = last_version.version + 1
+
+#         else:
+
+#             next_version = old_design.version + 1
+
+#         # ==========================================
+#         # CREATE NEW VERSION
+#         # ==========================================
+
+#         new_design = AIRoomDesign.objects.create(
+
+#             client=old_design.client,
+
+#             # Keep original room image
+#             original_image=old_design.original_image,
+
+#             room_type=old_design.room_type,
+
+#             design_style=old_design.design_style,
+
+#             color_theme=old_design.color_theme,
+
+#             lighting=old_design.lighting,
+
+#             budget=old_design.budget,
+
+#             prompt=edit_prompt,
+
+#             status="processing",
+
+#             # ======================================
+#             # VERSIONING
+#             # ======================================
+
+#             parent_design=root_design,
+
+#             version=next_version
+#         )
+
+#         print("====================================")
+#         print("AI VERSION GENERATION")
+#         print("Root Design:", root_design.id)
+#         print("Old Design:", old_design.id)
+#         print("New Design:", new_design.id)
+#         print("Version:", next_version)
+#         print("Edit Prompt:", edit_prompt)
+#         print("====================================")
+
+#         try:
+
+#             # ==========================================
+#             # GENERATE IMAGE
+#             # ==========================================
+
+#             generated_image = generate_room_design(
+#                 new_design
+#             )
+
+#             print(
+#                 "AI image generated successfully"
+#             )
+
+#             # ==========================================
+#             # BASE64 → BYTES
+#             # ==========================================
+
+#             image_bytes = base64.b64decode(
+#                 generated_image
+#             )
+
+#             # ==========================================
+#             # SAVE IMAGE
+#             # ==========================================
+
+#             new_design.generated_image.save(
+
+#                 f"room_design_{new_design.id}.png",
+
+#                 ContentFile(image_bytes),
+
+#                 save=False
+#             )
+
+#             # ==========================================
+#             # COMPLETE
+#             # ==========================================
+
+#             new_design.status = "completed"
+
+#             new_design.save()
+
+#             print("====================================")
+#             print("AI VERSION COMPLETED")
+#             print("Design ID:", new_design.id)
+#             print("Version:", new_design.version)
+#             print(
+#                 "Generated:",
+#                 new_design.generated_image.name
+#             )
+#             print("====================================")
+
+#             messages.success(
+#                 request,
+#                 f"Design version {new_design.version} created successfully!"
+#             )
+
+#             return redirect(
+#                 "ai_room_result",
+#                 design_id=new_design.id
+#             )
+
+#         except Exception as e:
+
+#             print("====================================")
+#             print("AI VERSION ERROR")
+#             print(e)
+#             print("====================================")
+
+#             new_design.status = "failed"
+
+#             new_design.save(
+#                 update_fields=["status"]
+#             )
+
+#             messages.error(
+#                 request,
+#                 "AI generation failed. Please try again."
+#             )
+
+#             return redirect(
+#                 "ai_room_result",
+#                 design_id=new_design.id
+#             )
+
+#     # ==========================================
+#     # GET EDIT PAGE
+#     # ==========================================
+
+#     return render(
+#         request,
+#         "ai_room_edit.html",
+#         {
+#             "design": old_design
+#         }
+#     )
+
+@role_required("client")
 def save_ai_design(request, design_id):
-
-    if 'log_id' not in request.session:
-        return redirect("login")
 
     design = get_object_or_404(
         AIRoomDesign,
@@ -1372,19 +1754,14 @@ def save_ai_design(request, design_id):
 
     design.is_saved = not design.is_saved
 
-    design.save(
-        update_fields=["is_saved"]
-    )
+    design.save(update_fields=["is_saved"])
 
     if design.is_saved:
-
         messages.success(
             request,
             "Design saved successfully!"
         )
-
     else:
-
         messages.success(
             request,
             "Design removed from saved designs."
@@ -1395,10 +1772,44 @@ def save_ai_design(request, design_id):
         design_id=design.id
     )
 
-def ai_saved_designs(request):
+# def save_ai_design(request, design_id):
 
-    if 'log_id' not in request.session:
-        return redirect("login")
+#     if 'log_id' not in request.session:
+#         return redirect("login")
+
+#     design = get_object_or_404(
+#         AIRoomDesign,
+#         id=design_id,
+#         client_id=request.session["log_id"]
+#     )
+
+#     design.is_saved = not design.is_saved
+
+#     design.save(
+#         update_fields=["is_saved"]
+#     )
+
+#     if design.is_saved:
+
+#         messages.success(
+#             request,
+#             "Design saved successfully!"
+#         )
+
+#     else:
+
+#         messages.success(
+#             request,
+#             "Design removed from saved designs."
+#         )
+
+#     return redirect(
+#         "ai_room_result",
+#         design_id=design.id
+#     )
+
+@role_required("client")
+def ai_saved_designs(request):
 
     designs = AIRoomDesign.objects.filter(
         client_id=request.session["log_id"],
@@ -1413,45 +1824,94 @@ def ai_saved_designs(request):
         }
     )
 
+# def ai_saved_designs(request):
+
+#     if 'log_id' not in request.session:
+#         return redirect("login")
+
+#     designs = AIRoomDesign.objects.filter(
+#         client_id=request.session["log_id"],
+#         is_saved=True
+#     ).order_by("-created_at")
+
+#     return render(
+#         request,
+#         "ai_saved_designs.html",
+#         {
+#             "designs": designs
+#         }
+#     )
+
+@role_required("client", "admin")
 def ai_room_versions(request, design_id):
 
-    if 'log_id' not in request.session:
-        return redirect("login")
-
-    design = get_object_or_404(
-        AIRoomDesign,
-        id=design_id,
-        client_id=request.session["log_id"]
-    )
-
-    # ==========================================
-    # FIND ROOT DESIGN
-    # ==========================================
+    if request.session.get("log_role") == "admin":
+        design = get_object_or_404(
+            AIRoomDesign,
+            id=design_id
+        )
+    else:
+        design = get_object_or_404(
+            AIRoomDesign,
+            id=design_id,
+            client_id=request.session["log_id"]
+        )
 
     root_design = design
 
     while root_design.parent_design:
-
         root_design = root_design.parent_design
-
-    # ==========================================
-    # GET ALL VERSIONS
-    # ==========================================
 
     versions = AIRoomDesign.objects.filter(
         Q(id=root_design.id) |
         Q(parent_design=root_design)
     ).order_by("version")
 
-    return render(
-        request,
-        "ai_room_versions.html",
-        {
-            "design": root_design,
-            "versions": versions
-        }
-    )
+    return render(request, "ai_room_versions.html", {
+        "design": root_design,
+        "versions": versions
+    })
 
+# def ai_room_versions(request, design_id):
+
+#     if 'log_id' not in request.session:
+#         return redirect("login")
+
+#     design = get_object_or_404(
+#         AIRoomDesign,
+#         id=design_id,
+#         client_id=request.session["log_id"]
+#     )
+
+#     # ==========================================
+#     # FIND ROOT DESIGN
+#     # ==========================================
+
+#     root_design = design
+
+#     while root_design.parent_design:
+
+#         root_design = root_design.parent_design
+
+#     # ==========================================
+#     # GET ALL VERSIONS
+#     # ==========================================
+
+#     versions = AIRoomDesign.objects.filter(
+#         Q(id=root_design.id) |
+#         Q(parent_design=root_design)
+#     ).order_by("version")
+
+#     return render(
+#         request,
+#         "ai_room_versions.html",
+#         {
+#             "design": root_design,
+#             "versions": versions
+#         }
+#     )
+
+@role_required("client")
 def delete_ai_design(request, design_id):
 
     if 'log_id' not in request.session:
@@ -1478,6 +1938,7 @@ def delete_ai_design(request, design_id):
         "ai_room_history"
     )
 
+@role_required("client", "admin")
 def restore_design_version(request, design_id, version_id):
 
     if "log_id" not in request.session:

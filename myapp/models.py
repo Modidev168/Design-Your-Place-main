@@ -3,14 +3,20 @@ from django.utils.safestring import mark_safe
 from multiselectfield import MultiSelectField
 
 # Create your models here.
+ROLE_CHOICES = [
+    ("admin", "Admin"),
+    ("designer", "Designer"),
+    ("client", "Client"),
+]
 class registermodel(models.Model):  # register model
+
     fullname = models.CharField(max_length=20)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=200)
     # confirmpassword = models.CharField(max_length=200)
     phone = models.BigIntegerField()
     Identy_Card = models.ImageField(upload_to="photos", default="")
-    Role = models.CharField(max_length=10, null=False, default="designer")
+    Role = models.CharField(max_length=10,choices=ROLE_CHOICES,default="client")
 
     reset_otp = models.CharField(max_length=6, blank=True, null=True)
     otp_created_at = models.DateTimeField(blank=True, null=True)
